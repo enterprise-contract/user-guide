@@ -1,0 +1,12 @@
+
+= The Enterprise Contract Cookbook
+
+:numbered:
+
+These docs are intendend to describe how to configure and use Enterprise
+Contract with Stonesoup.
+
+Rather than describe the low-level components of EC, this will focus on
+high-level user interactions with Enterprise Contract via the Stonesoup UI.
+
+These docs may be folded in to a Stonesoup User Guide in the future.

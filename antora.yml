@@ -1,0 +1,5 @@
+name: ec-cookbook
+title: EC Cookbook
+version: main
+nav:
+- modules/ROOT/nav.adoc
