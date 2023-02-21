@@ -104,4 +104,98 @@ but perhaps there's a problem with the name length constraints.
 So the EC policy checked passed, but so far it's not very clear yet what
 exactly passed and what policies were applied. Let's take a closer look.
 
-__To be continued...__
+=== Command line credentials
+
+We want to access the cluster using kubectl and oc, so let's get the credentials for that.
+
+The link to get a token is link:https://registration-service-toolchain-host-operator.apps.stone-stg-host1.hjvn.p1.openshiftapps.com/[this one].
+Authenticate, then click the "Proxy login command" link in the top right.
+
+.Copying the 'oc login --token...' command
+image::c90a10af101399fadaa3ab5bc81597ef.png[]
+
+Paste the login command in your terminal and you should logged in to the cluster.
+
+[,bash]
+----
+$ oc login --token=<very-long-token> --server=<server-url>
+Logged into "https://api-toolchain-host-operator.apps.stone-stg-host1.hjvn.p1.openshiftapps.com:443" as "sbaird" using the token provided.
+
+You have one project on this server: "sbaird-tenant"
+
+Using project "sbaird-tenant".
+----
+
+=== The IntegrationTestScenario record
+
+Before we look at the Enterprise Contract Configuration, let's look at the
+Integration Test Scenario. This is the record that corresponds to the
+integration test visible under the "Integration Tests". In my case it's called
+`ec-policy-check`.
+
+Listing all the IntegrationTestScenario records:
+
+[,bash]
+----
+$ oc get integrationtestscenario
+NAME              APPLICATION
+ec-policy-check   my-node-app
+----
+
+Inspecting the ec-policy-check IntegrationTestScenario record.
+
+NOTE: In this example I'm filtering out the majority of the metadata since it's
+not particularly interesting for the purposes of these docs.
+
+[,bash]
+----
+$ oc get integrationtestscenario ec-policy-check -o yaml | yq '.metadata |= {"name":.name,"namespace":.namespace}'
+----
+
+[,yaml]
+----
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: IntegrationTestScenario
+metadata:
+  name: ec-policy-check
+  namespace: sbaird-tenant
+spec:
+  application: my-node-app
+  bundle: quay.io/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract:devel
+  contexts:
+    - description: Application testing
+      name: application
+  pipeline: enterprise-contract
+status:
+  conditions:
+    - lastTransitionTime: "2023-02-20T22:40:03Z"
+      message: Integration test scenario is Valid.
+      reason: Valid
+      status: "True"
+      type: IntegrationTestScenarioValid
+----
+
+Actually there's not a lot to pay attention to here. Notice the bundle and the
+pipeline which were entered via the UI. Later we'll we'll be modifying this
+record to add some params that will be passed to the integration test pipeline.
+
+=== The EnterpriseContractPolicy record
+
+It's not trivial to find which configuration is being used for the Enterprise
+Contract. The answer is in the value of the pipeline param called
+`POLICY_CONFIGURATION`,
+link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml#L30[see here].
+
+The value of that default is `enterprise-contract-service/default`.
+
+We can use that to find the relevant EnterpriseContractPolicy record:
+
+[,bash]
+----
+$ oc get -n enterprise-contract-service enterprisecontractpolicy default -o yaml | yq .spec
+----
+
+[,yaml]
+----
+todo
+----
