@@ -199,3 +199,8 @@ $ oc get -n enterprise-contract-service enterprisecontractpolicy default -o yaml
 ----
 todo
 ----
+
+TIP: The stage cluster is offline, so progress will slow down on the next
+steps. There is some more content in the
+link:https://docs.google.com/document/d/1Co61T_ii4fPQBQl2Z_GYe1lDDAFJg2z1plpIcaFderk/edit[original Google Docs version]
+which may be useful if you are playing with EC and Stonesoup.
