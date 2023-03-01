@@ -1,0 +1,159 @@
+
+= Using the Enterprise Contract command line
+
+== Installation
+
+=== Downloading a binary
+
+Visit link:https://github.com/hacbs-contract/ec-cli/releases[the releases
+page], scroll and expand "Assets". Find the appropriate binary for your system,
+download it and copy it to somewhere in your path.
+
+For example:
+
+[,bash]
+----
+$ curl -sLO https://github.com/hacbs-contract/ec-cli/releases/download/snapshot/ec_linux_amd64
+$ chmod 755 ec_linux_amd64
+$ sudo mv ec_linux_amd64 /usr/local/bin/ec
+$ which ec
+$ ec version
+$ ec --help
+----
+
+=== Running with docker or podman
+
+If you have docker or podman installed you can also run ec like this:
+
+[,bash]
+----
+$ podman run quay.io/hacbs-contract/ec-cli:snapshot
+----
+
+For convenience you could create an alias. For example:
+
+[,bash]
+----
+$ alias ec="podman run quay.io/hacbs-contract/ec-cli:snapshot"
+$ ec version
+$ ec --help
+----
+
+NOTE: There might be some extra work needed to mount files inside the
+container, for example, if your public key is in a file, you would need to
+mount it when running podman. To avoid this, the examples below pass the
+content of the public key file, rather than the file name.
+
+[,bash]
+----
+podman run -v ./key.pub:/tmp/key.pub:Z quay.io/hacbs-contract/ec-cli:snapshot validate image ...
+----
+
+=== Compiling from source
+
+To compile ec from source:
+
+[,bash]
+----
+$ git clone git@github.com:hacbs-contract/ec-cli.git
+$ cd hacbs-contract
+$ make build
+$ sudo cp dist/ec_linux_amd64 /usr/local/bin/ec
+$ which ec
+$ ec version
+$ ec --help
+----
+
+== Validating an image
+
+To run ec against a particular container image built by Stonesoup, we use the
+`ec validate image` command. To see the command options you can use the
+`--help` flag, e.g.:
+
+[,bash]
+----
+$ ec validate image --help
+----
+
+For these examples I'm going to use a particular image with a known signing
+key.
+
+When validating an image we need to provide three things:
+
+- The image reference
+- The public key for verifying signatures
+- A policy configuration file which determines what policies are to be applied
+
+NOTE: Actually the public key can be provided via the configuration, but for
+these examples we'll provide it separately using the `--public-key` flag.
+
+For the sake of more readable command lines in these examples, let's create a
+some environment vars and a file for the three pieces of information:
+
+[,bash]
+----
+$ export IMAGE_REF="quay.io/cuipinghuo/hermetic_build:0.3"
+
+$ export PUBLIC_KEY="-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpXcIGCQmaP7qhEq/xfXT49BNBmTE
+AWJvteQ7WiOp1VovrkOlqW64afWtf3qPz70ETXUhZ42lHvg1aKu24vKK/w==
+-----END PUBLIC KEY-----"
+
+$ echo '
+sources:
+  - policy:
+      - "quay.io/hacbs-contract/ec-release-policy:latest"
+    data:
+      - "quay.io/hacbs-contract/ec-policy-data:latest"
+configuration:
+  collections:
+    - minimal
+  include:
+    - "*"
+  exclude: []
+' > policy.yml
+----
+
+Now we can run the ec like this:
+
+[,bash]
+----
+$ ec validate image --output yaml --image "$IMAGE_REF" \
+    --public-key "$PUBLIC_KEY" --policy "$(yq -ojson -I0 config.yml)" | yq
+----
+
+NOTE: The inline policy configuration needs to be json formatted, but I want to
+use yaml for these examples, so that's why the `yq -ojson ...` is used above.
+In future ec should support yaml directly, see
+link:https://issues.redhat.com/browse/HACBS-1898[HACBS-1898].
+
+== Finding the public key
+
+If you have access to the Stonesoup cluster, you can extract the public key like this:
+
+[,bash]
+----
+kubectl get -n tekton-chains secret public-key -o jsonpath='{.data.cosign\.pub}' > cosign.pub
+----
+
+== Finding your image ref
+
+Todo. Should be visible in a task result.
+
+== EC output
+
+Todo.
+
+== EC policy configuration
+
+Todo.
+
+== Using `collections`, `include` and `exclude`
+
+Todo.
+
+== Using custom data
+
+Todo.
+
+== Using custom policies
