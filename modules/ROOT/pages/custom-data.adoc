@@ -1,0 +1,392 @@
+
+== Customizing EC data
+
+I'll work through real-world example.
+
+== Cluster auth
+
+Visit link:https://oauth-openshift.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/oauth/token/request[this
+url], authenticate and click "Display Token".
+
+Copy the `oc login` command and paste it into a terminal.
+
+[.console-input]
+[source, bash]
+----
+$ oc login --token=.... --server=....
+Logged into "https://api.stone-prd-rh01.pg1f.p1.openshiftapps.com:6443" as "simonbaird" using the token provided.
+
+You have access to 134 projects, the list has been suppressed. You can list all projects with ' projects'
+
+Using project "default".
+----
+
+== Extracting the public key
+
+[.console-input]
+[source, bash]
+----
+kubectl get -n tekton-chains secret public-key -o json | jq -r '.data."cosign.pub" | @base64d' > cosign.pub
+----
+
+== Extracting the default ECP config
+
+[.console-input]
+[source, bash]
+----
+kubectl get -n enterprise-contract-service enterprisecontractpolicy default -o yaml | yq .spec > policy.yml
+----
+
+== Running EC locally
+
+Install ec as per xref:cli.adoc[these instructions] then do the following.
+
+Replace the image ref with your image ref.
+
+TODO: Explain how to find the image ref.
+
+[.console-input]
+[source, bash]
+----
+export IMAGE=quay.io/redhat-appstudio/user-workload:rrqte-devfile-sample-python-basic6-agrl
+ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P
+----
+
+
+In the above example we downloaded the public key and the policy, but since we
+have cluster access, it's not actually required. EC can find the public key and
+the policy configuration in the cluster. For example we can do this, which
+should give the same result:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --policy enterprise-contract-service/default | yq -P
+----
+
+For this example I'll continue using the local key and policy, but the concepts
+process would be the same if we used the cluster records directly.
+
+For reference, here is the ec output I'm getting currently, with the default policy:
+
+[source, yaml]
+----
+success: true
+components:
+  - name: Unnamed
+    containerImage: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+    violations: []
+    warnings: []
+    success: true
+    successCount: 31
+    signatures: ...
+key: ...
+----
+
+And here is the default policy:
+
+[source, yaml]
+----
+configuration:
+  collections:
+    - minimal
+description: |
+  Default EnterpriseContractPolicy. If a different policy is desired, this resource can serve as a starting point.
+publicKey: k8s://tekton-chains/public-key
+sources:
+  - data:
+      - oci::https://quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+    name: Default Policies
+    policy:
+      - oci::https://quay.io/hacbs-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+----
+
+Notice that the EC is currently passing. There are no violations and the top
+level success value is `true`.
+
+== Modify the policy so all rules are applied
+
+Notice the configuration currenly specifies the `minimal` collection. This means there
+are a subset of the rules being applied. You can see the list of rules in the
+link:https://hacbs-contract.github.io/ec-policies/release_policy.html#_available_rule_collections[documentation here].
+
+You can also use ec to produce a list of the rules like this:
+
+[.console-input]
+[source, bash]
+----
+ec inspect policy --source quay.io/hacbs-contract/ec-release-policy --collection minimal --output text
+----
+
+By default EC applies all the rules found in the policy source. So we can just remove the collection configuration to make this happen.
+
+Let's do that and re-run the EC locally.
+
+Edit the policy.yml file:
+
+[source, yaml]
+----
+configuration: {}
+sources:
+  - data:
+      - oci::https://quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+    policy:
+      - oci::https://quay.io/hacbs-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+----
+
+NOTE: To make these examples tidier I removed some `description` and `name`
+fields that won't be consequential. You can leave them alone or modify them if
+you wish.
+
+Running the EC with this new policy configuration produces some violations:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P .components.[].violations
+----
+
+[source, yaml]
+----
+- msg: Build task was not invoked with hermetic parameter
+  metadata:
+    code: hermetic_build_task.build_task_not_hermetic
+    effective_on: "2022-01-01T00:00:00Z"
+- msg: Required task "prefetch-dependencies" is missing
+  metadata:
+    code: tasks.missing_required_task
+    effective_on: "2022-01-01T00:00:00Z"
+- msg: Required task "sast-snyk-check" is missing
+  metadata:
+    code: tasks.missing_required_task
+    effective_on: "2022-01-01T00:00:00Z"
+- msg: Step 0 in task 'show-summary' has disallowed image ref 'quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9f0cdc00b1b1a3c17411e50653253b9f6bb5329ea4fb82ad983790a6dbf2d9ad'
+  metadata:
+    code: step_image_registries.disallowed_task_step_image
+    effective_on: "2022-01-01T00:00:00Z"
+- msg: Test "sanity-label-check" did not complete successfully
+  metadata:
+    code: test.test_result_failures
+    effective_on: "2022-01-01T00:00:00Z"
+----
+
+== Modify the policy to skip some rules that are currently failing
+
+Let's say you are aware of the reasons for the violations and want to skip
+them. You can do this using the `exclude` configuration field.
+
+Modify the `policy.yaml` file:
+
+[source, yaml]
+----
+configuration:
+  exclude:
+    - hermetic_build_task.build_task_not_hermetic
+    - tasks.missing_required_task:prefetch-dependencies
+    - tasks.missing_required_task:sast-snyk-check
+    - test.test_result_failures:sanity-label-check
+sources:
+  - data:
+      - oci::https://quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+    policy:
+      - oci::https://quay.io/hacbs-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+----
+
+Re-run ec:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P .components.[].violations
+----
+
+[source, yaml]
+----
+- msg: Step 0 in task 'show-summary' has disallowed image ref 'quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9f0cdc00b1b1a3c17411e50653253b9f6bb5329ea4fb82ad983790a6dbf2d9ad'
+  metadata:
+    code: step_image_registries.disallowed_task_step_image
+    effective_on: "2022-01-01T00:00:00Z"
+----
+
+There's one violation left. We could skip that one too, but I want to use that
+violation as example of how to provide custom data.
+
+== Adding a custom data source
+
+The violation message tells us that the task is using a disallowed image ref.
+
+Rather than skip the test, let's imagine you want to modify the behavior of the
+`step_image_registries.disallowed_task_step_image` rule to allow images from
+the `quay.io/openshift-release-dev`.
+
+This is the kind of thing that a Stonesoup user might want to do based on what
+security policies they decide are appopriate for their situation.
+
+First, let's take a look at how that rule works. The documentation is
+link:https://hacbs-contract.github.io/ec-policies/release_policy.html#step_image_registries__disallowed_task_step_image[here].
+
+Clicking through to
+link:https://github.com/hacbs-contract/ec-policies/blob/main/policy/release/step_image_registries.rego#L32[the
+code] we can see a reference to `allowed_step_image_registry_prefixes`. This refers to some data that
+comes from the `data` source.
+
+NOTE: There should be an easier way for users to know what data is related to a
+rule. Perhaps just mentioning it in the annotation description is a good
+starting point.
+
+The data source in the policy config from `quay.io/hacbs-contract/ec-policy-data` includes all the data from link:https://github.com/hacbs-contract/ec-policies/tree/main/data[here].
+
+NOTE: This would be less confusing if we had the `ec inspect data` command, which is planned in link:https://issues.redhat.com/browse/HACBS-1732[HACBS-1732].
+
+Looking at the
+link:https://github.com/hacbs-contract/ec-policies/blob/main/data/rule_data.yml[rule_data.yml]
+file we can see that `allowed_step_image_registry_prefixes` is a list of
+strings which define the policy about which specify defines the policy enforced
+by the `step_image_registries.disallowed_task_step_image` rule.
+
+=== Creating the data source
+
+The easiest way to create a custom data source is to use a git repo in GitHub.
+For this example I did it like this:
+
+[.console-input]
+[source, bash]
+----
+mkdir ec-data-demos
+cd ec-data-demos/
+git init .
+git remote add origin git@github.com:simonbaird/ec-data-demos.git # Repo created in GitHub already
+mkdir step_registry_prefixes
+vi step_registry_prefixes/data.yml # Use content from below
+git add step_registry_prefixes/data.yml
+git commit -m "Add custom step registry prefixes"
+git push origin main
+----
+
+The contents of step_registry_prefixes looks like this:
+
+[source, yaml]
+----
+rule_data_custom:
+  allowed_step_image_registry_prefixes:
+    - trusted-registry.example.io/secure-task-runners/
+----
+
+See the file in
+link:https://github.com/simonbaird/ec-data-demos/blob/example1/step_registry_prefixes/data.yml[GitHub
+here].
+
+That's not a real registry prefix of course, but let's start with that and see
+what results EC produces.
+
+=== Configuring EC to use the data source
+
+Let's modify the `policy.yml` file to add an extra data source:
+
+[source, yaml]
+----
+configuration:
+  exclude:
+    - hermetic_build_task.build_task_not_hermetic
+    - tasks.missing_required_task:prefetch-dependencies
+    - tasks.missing_required_task:sast-snyk-check
+    - test.test_result_failures:sanity-label-check
+sources:
+  - data:
+      - oci::https://quay.io/hacbs-contract/ec-policy-data:latest
+      - git::https://github.com/simonbaird/ec-data-demos//step_registry_prefixes
+    policy:
+      - oci::https://quay.io/hacbs-contract/ec-release-policy:latest
+----
+
+TIP: Actually we could have left out the `oci::https://` and `git::https://`
+because ec knows that github.com is for git and quay.io is for container
+images.
+
+Now let's run ec again:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P '.components.[].violations.[].msg'
+----
+
+[source, yaml]
+----
+Step 0 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/buildah@sha256:381e9bfedd59701477621da93892106873a6951b196105d3d2d85c3f6d7b569b'
+Step 0 in task 'clair-scan' has disallowed image ref 'quay.io/redhat-appstudio/clair-in-ci@sha256:fd6affa3ae32625609b96642129c489bed4cee0a9426cb0e203bd5949eba98d8'
+Step 0 in task 'clamav-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'clone-repository' has disallowed image ref 'registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:2fa0b06d52b04f377c696412e19307a9eff27383f81d87aae0b4f71672a1cd0b'
+Step 0 in task 'deprecated-base-image-check' has disallowed image ref 'registry.access.redhat.com/ubi8/ubi-minimal@sha256:0214a28336e387c66493c61bb394e86a18f3bea8dbc46de74a26f173ff553c89'
+Step 0 in task 'init' has disallowed image ref 'registry.redhat.io/openshift4/ose-tools-rhel8@sha256:253d042ecfad7b64593112a4aa3f528d39cb5fe738852e44f009db87964cf051'
+Step 0 in task 'sanity-inspect-image' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sanity-label-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sanity-optional-label-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sbom-json-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'show-summary' has disallowed image ref 'quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9f0cdc00b1b1a3c17411e50653253b9f6bb5329ea4fb82ad983790a6dbf2d9ad'
+Step 1 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/syft@sha256:09afc449976230f66848c19bb5ccf344eb0eeb4ed50747e33b53aff49462c319'
+Step 1 in task 'clair-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 1 in task 'clamav-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 1 in task 'deprecated-base-image-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 2 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-jvm-build-request-processor@sha256:b198cf4b33dab59ce8ac25afd4e1001390db29ca2dec83dc8a1e21b0359ce743'
+Step 2 in task 'clair-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 2 in task 'clamav-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 3 in task 'build-container' has disallowed image ref 'registry.redhat.io/ubi9/python-39@sha256:a4833397a08024b156f7bccbf220b3012c206ba902767978de640128132f30c7'
+Step 4 in task 'build-container' has disallowed image ref 'registry.access.redhat.com/ubi9/buildah@sha256:c8b1d312815452964885680fc5bc8d99b3bfe9b6961228c71a09c72ca8e915eb'
+Step 5 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/cosign@sha256:18b3716a6225727877475e1ab4f2493915e72cffd2ce431e9901d2ed2e4b2c0b'
+----
+
+As you might have predicted, EC is now reporting that all the steps are using disallowed image refs.
+
+Let's fix that now. Back in the git repo for your custom data source, modify
+`step_registry_prefixes/data.yml` to look like this:
+
+[source, yaml]
+----
+rule_data_custom:
+  allowed_step_image_registry_prefixes:
+    - quay.io/redhat-appstudio/
+    - quay.io/openshift-release-dev/
+    - registry.access.redhat.com/
+    - registry.redhat.io/
+----
+
+Then push it up to GitHub:
+
+[.console-input]
+[source, bash]
+----
+git add step_registry_prefixes/data.yml
+git commit -m "More useful set of step image prefixes"
+git push origin main
+----
+
+Running ec again with the updated data source should now give you as passing results:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P
+----
+
+[source, yaml]
+----
+success: true
+components:
+  - name: Unnamed
+    containerImage: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+    violations: []
+    warnings:
+      - msg: Pipeline task 'build-container' uses an out of date task bundle 'quay.io/redhat-appstudio-tekton-catalog/task-buildah:0.1@sha256:3ec1cd16f0467534db8e4d1ffcacfb18a5801acc763e8dcd4d92c292e3aa3de6'
+        metadata:
+          code: attestation_task_bundle.out_of_date_task_bundle
+          effective_on: "2022-01-01T00:00:00Z"
+      - msg: Required tasks do not exist for pipeline
+        metadata:
+          code: tasks.missing_required_pipeline_task_warning
+          effective_on: "2022-01-01T00:00:00Z"
+    success: true
+    successCount: 38
+    signatures: ...
+key: ...
+----

@@ -3,3 +3,4 @@
 * xref:getting-started.adoc[Getting started with Enterprise Contract & Stonesoup]
 * xref:cosign.adoc[Cosign & Stonesoup]
 * xref:cli.adoc[Using the EC command line]
+* xref:custom-data.adoc[Using custom data]
