@@ -19,3 +19,26 @@ image that was created, (i.e. the container repository and a tag or digest), of
 the image that was created, and that you have access to that repository.
 
 ...to be continued...
+
+== Using `cosign tree`
+
+`cosign tree` is a useful command that lists all related images. Given an
+application component image for example
+`quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`
+a list of attestation images with individual attestation image layers,
+signatures and Software Bill of Materials (SBOM) is printed.
+
+[.console-input]
+[source, bash]
+----
+cosign tree quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+📦 Supply Chain Security Related artifacts for an image: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+└── 💾 Attestations for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.att
+   ├── 🍒 sha256:410f897e3649a8688a0ffbcbe7c370679d9a24ec31be0a433431e4110d335fb4
+   ├── 🍒 sha256:7a8154760765d3ec8f27b1c40f55d5f1c3273edf268e38ba5a01c55bc98dac4d
+   └── 🍒 sha256:3c487af472fcf00827acd8721156da0e39bd8ca2aa9437aa8c5dfdc6b725e9b9
+└── 🔐 Signatures for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sig
+   └── 🍒 sha256:cce08e81cb1722dc91c80e80b72964f41841a8351da2c60ae090138dbbdff83d
+└── 📦 SBOMs for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sbom
+   └── 🍒 sha256:72f7c108f43c4594bec8459d516ec3e2e568474ae9fd0e974d5b1b70288238cc
+----
