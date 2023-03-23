@@ -211,6 +211,51 @@ ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -
 There's one violation left. We could skip that one too, but I want to use that
 violation as example of how to provide custom data.
 
+== Modify the in-cluster policy
+
+The steps above make modifications to a local copy of the policy. It is also possible to create the
+policy in the cluster.
+
+The default policy is a good place to start, fetch its full form:
+
+[.console-input]
+[source, bash]
+---
+kubectl get -n enterprise-contract-service enterprisecontractpolicy default -o yaml > local-policy.yml
+---
+
+Next, use an editor to modify the policy as needed. Remove the `.metadata.namespace` attribute. We
+will provide a namespace later.
+
+At the beginning of this document, you logged in on a member cluster. This is, currently, required in
+order to access the default
+link:https://hacbs-contract.github.io/ecc/main/reference.html#k8s-api-github-com-hacbs-contract-enterprise-contract-controller-api-v1alpha1-enterprisecontractpolicy[EnterpriseContractPolicy]
+and the public key. However, resources on the
+cluster cannot be created this way. They must be created via the proxy. To do so, obtain a token from
+https://registration-service-toolchain-host-operator.apps.stone-prd-host1.wdlc.p1.openshiftapps.com/[here]
+by clicking on the "Proxy login command" link on the top right. Paste that in your terminal.
+
+Then, create a resource on the cluster for the policy you have modified locally:
+
+[.console-input]
+[source, bash]
+---
+kubectl create -f local-policy.yml
+---
+
+If you have more than one namespace, choose one by specifying the `-n` flag for the command above.
+
+Now, log back in to the member cluster as mentioned in <<_cluster_auth>>.
+
+Finally, use the new policy. If the policy was created on the namespace `alice-tenant` and was named
+`alice-policy`, the policy can be used as:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --policy alice-tenant/alice-policy | yq -P
+----
+
 == Adding a custom data source
 
 The violation message tells us that the task is using a disallowed image ref.
