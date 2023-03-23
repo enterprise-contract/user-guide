@@ -220,9 +220,9 @@ The default policy is a good place to start, fetch its full form:
 
 [.console-input]
 [source, bash]
----
+----
 kubectl get -n enterprise-contract-service enterprisecontractpolicy default -o yaml > local-policy.yml
----
+----
 
 Next, use an editor to modify the policy as needed. Remove the `.metadata.namespace` attribute. We
 will provide a namespace later.
@@ -239,9 +239,9 @@ Then, create a resource on the cluster for the policy you have modified locally:
 
 [.console-input]
 [source, bash]
----
+----
 kubectl create -f local-policy.yml
----
+----
 
 If you have more than one namespace, choose one by specifying the `-n` flag for the command above.
 
