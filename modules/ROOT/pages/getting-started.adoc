@@ -58,7 +58,7 @@ release anything that is failing the policy check.
   link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml[here
   in the build-definitions repo].
 - The source the the Tekton task used by that pipeline is in a different place. It is
-  link:https://github.com/hacbs-contract/ec-cli/blob/main/tasks/verify-enterprise-contract/0.1/verify-enterprise-contract.yaml[here
+  link:https://github.com/enterprise-contract/ec-cli/blob/main/tasks/verify-enterprise-contract/0.1/verify-enterprise-contract.yaml[here
   in the ec-cli repo].
 - If you prefer to pin the pipeline bundle to a particular version, instead of using the `devel` tag, use one of the pinned tags
   link:https://quay.io/repository/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract?tab=tags[visible here]. Note that the
