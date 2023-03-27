@@ -1,16 +1,16 @@
 
 #----------------------------------------------------------------------------
-# Build a preview of the docs published at https://hacbs-contract.github.io/
+# Build a preview of the docs published at https://enterprise-contract.github.io/
 # including the current changes in this local repo.
 #
 # Usage:
 #   make ec-docs-preview
 #
 # See also the hack/local-build.sh script in the
-# hacbs-contract.github.io repo which does something similar
+# enterprise-contract.github.io repo which does something similar
 #
-HACBS_DOCS_DIR=../hacbs-contract.github.io
-HACBS_DOCS_REPO=git@github.com:hacbs-contract/hacbs-contract.github.io.git
+HACBS_DOCS_DIR=../enterprise-contract.github.io
+HACBS_DOCS_REPO=git@github.com:enterprise-contract/enterprise-contract.github.io.git
 $(HACBS_DOCS_DIR):
 	mkdir $(HACBS_DOCS_DIR) && cd $(HACBS_DOCS_DIR) && git clone $(HACBS_DOCS_REPO) .
 
