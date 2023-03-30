@@ -1,16 +1,19 @@
 
-= Using Cosign to verify Stonesoup build signatures & attestations
+= Using Cosign to verify RHTAP build signatures & attestations
 
 In this section we'll provide examples showing how to use cosign to verify
-signatures and attestations for builds created by Stonesoup.
+signatures and attestations for builds created by Red Hat Trusted Application
+Pipeline, RHTAP.
 
 For detailed information on Cosign refer to the
 link:https://docs.sigstore.dev/cosign/overview/[official documentation].
 
+This document assumes cosign version 2.
+
 == Introduction
 
-Stonesoup uses link:https://tekton.dev/docs/chains/[Tekton Chains] to sign the
-images created by Stonesoup build pipelines, and to create signed attestations
+RHTAP uses link:https://tekton.dev/docs/chains/[Tekton Chains] to sign the
+images created by RHTAP build pipelines, and to create signed attestations
 that include details about the Tekton pipeline run that created the image.
 
 It's possible to verify these signatures and view the attestation directly
@@ -18,20 +21,113 @@ using cosign. This does require that you know the image ref of the container
 image that was created, (i.e. the container repository and a tag or digest), of
 the image that was created, and that you have access to that repository.
 
-...to be continued...
+== Obtain image reference
 
-== Using `cosign tree`
+When validating an image, from an application component for example, it is
+recommended to always use an image reference includes a digest. The RHTAP
+build pipelines emit results that contain this information. They are called
+`IMAGE_URL` and `IMAGE_DIGEST`. Combine the two with the `@` to create the
+image reference with a digest. For example, if
+`IMAGE_URL` is `quay.io/redhat-appstudio/user-workload`, and `IMAGE_DIGEST`
+is `sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`,
+the image reference that should be used during validatin is
+`quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`.
 
-`cosign tree` is a useful command that lists all related images. Given an
-application component image for example
-`quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`
-a list of attestation images with individual attestation image layers,
-signatures and Software Bill of Materials (SBOM) is printed.
+It is also possible to obtain the image reference from the Web UI.
+
+== Obtain public key
+
+Currently, RHTAP uses a long-lived key for signing. This key can be retrieved
+from the corresponding member cluster:
 
 [.console-input]
 [source, bash]
 ----
-cosign tree quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+kubectl get -n tekton-chains secret public-key -o json | jq -r '.data."cosign.pub" | @base64d' > cosign.pub
+----
+
+== Validating the image
+
+The first step in validating an image is verifying it has been signed with the
+proper signature. This is to ensure the image was indeed built in a RHTAP
+build pipeline.
+
+[.console-input]
+[source, bash]
+----
+$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ cosign verify --key cosign.pub $IMAGE --insecure-ignore-tlog
+WARNING: Skipping tlog verification is an insecure practice that lacks of transparency and auditability verification for the signature.
+
+Verification for quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - The signatures were verified against the specified public key
+
+[{"critical":{"identity":{"docker-reference":"quay.io/redhat-appstudio/user-workload"},"image":{"docker-manifest-digest":"sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d"},"type":"cosign container image signature"},"optional":null}]
+----
+
+NOTE: At the moment, RHTAP does not use a transparency log like Rekor. Starting
+with version 2, cosign requires the explicit flag `--insecure-ignore-tlog` to
+not use Rekor during the verification process.
+
+Next, validate that the image contains the expected SLSA Provenance attestations.
+Images built by the RHTAP build pipeline will have two of them. One representing
+the Tekton TaskRun in which the image was built, and one representing the Tekton
+PipelineRun that contains the previously mentioned TaskRun. The attestation for
+the PipelineRun is useful in understanding all the steps used when building the
+image.
+
+[.console-input]
+[source, bash]
+----
+$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ cosign verify-attestation --type slsaprovenance  --key cosign.pub $IMAGE --insecure-ignore-tlog > slsa-provenance-attestations.json
+WARNING: Skipping tlog verification is an insecure practice that lacks of transparency and auditability verification for the attestation.
+
+Verification for quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - The signatures were verified against the specified public key
+----
+
+The output of the `cosign verify-attestation` command displays the attestations
+themselves. The snippet above saves those attestations into a file, called
+`slsa-provenance-attestations.json`.
+
+At this point, a policy engine like OPA or conftest can be used to validate the
+contents of the attestations.
+
+At the moment, the Software Bill of Materials (SBOM) attachment is not signed.
+However, it can be inspected via the `cosign download sbom` command. It is
+important to note that this command offers no guarantee that the SBOM attachment
+was produced as part of the RHTAP build pipeline.
+
+[source, bash]
+----
+$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ cosign download sbom $IMAGE > sbom.json
+WARNING: Downloading SBOMs this way does not ensure its authenticity. If you want to ensure a tamper-proof SBOM, download it using 'cosign download attestation <image uri>' or verify its signature using 'cosign verify --key <key path> --attachment sbom <image uri>'.
+Found SBOM of media type: application/vnd.cyclonedx+json
+----
+
+The snippet above saves the SBOM into a file named `sbom.json`. This file could
+also be used as input to a policy engine. However, beware that since it is not
+signed, it is susceptible to modifications outside the RHTAP build pipeline.
+
+== Using `cosign tree`
+
+`cosign tree` is a useful command that lists all related entities for an image,
+such as image signatures, image attestations, and Software Bill of Materials (SBOM)
+attachments.
+
+For example:
+
+[.console-input]
+[source, bash]
+----
+$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ cosign tree $IMAGE
 📦 Supply Chain Security Related artifacts for an image: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
 └── 💾 Attestations for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.att
    ├── 🍒 sha256:410f897e3649a8688a0ffbcbe7c370679d9a24ec31be0a433431e4110d335fb4
@@ -42,3 +138,6 @@ cosign tree quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187df
 └── 📦 SBOMs for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sbom
    └── 🍒 sha256:72f7c108f43c4594bec8459d516ec3e2e568474ae9fd0e974d5b1b70288238cc
 ----
+
+Although `cosign tree` is not necessary for validation, it is a powerful
+command to inspect the current state of an image.
