@@ -66,7 +66,7 @@ $ ec --help
 
 == Validating an image
 
-To run ec against a particular container image built by Stonesoup, we use the
+To run ec against a particular container image built by RHTAP, we use the
 `ec validate image` command. To see the command options you can use the
 `--help` flag, e.g.:
 
@@ -129,7 +129,7 @@ link:https://issues.redhat.com/browse/HACBS-1898[HACBS-1898].
 
 == Finding the public key
 
-If you have access to the Stonesoup cluster, you can extract the public key like this:
+If you have access to the RHTAP cluster, you can extract the public key like this:
 
 [,bash]
 ----

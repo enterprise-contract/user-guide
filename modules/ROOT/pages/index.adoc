@@ -3,15 +3,15 @@
 
 :numbered:
 
-These docs are intendend to describe how to configure and use Enterprise
-Contract with Stonesoup.
+These docs are intended to describe how to configure and use Enterprise
+Contract with Red Hat Trusted Application Pipeline (RHTAP).
 
 Rather than describe the low-level components of EC, this will focus on
-high-level user interactions with Enterprise Contract via the Stonesoup UI.
+high-level user interactions with Enterprise Contract via RHTAP.
 
-These docs may be folded in to a Stonesoup User Guide in the future.
+These docs may be folded in to an RHTAP User Guide in the future.
 
-IMPORTANT: The Enterprise Contract and the Stonesoup UI is evolving rapidly.
+IMPORTANT: The Enterprise Contract and RHTAP are evolving rapidly.
 We'll aim to keep this documentation current, but beware that parts of this
 documentation may become out of date quickly.
 
@@ -20,4 +20,4 @@ for inclusion in customer-facing documentation. This content could be adapted
 for use in customer-facing docs, but currently it's not suitable for that
 purpose.
 
-Continue to xref:getting-started.adoc[Getting started with Enterprise Contract and Stonesoup].
+Continue to xref:getting-started.adoc[Getting started with Enterprise Contract and RHTAP].

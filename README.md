@@ -2,7 +2,7 @@ Enterprise Contract Cookbook
 ============================
 
 Some high level documentation on how to use and configure Enterprise in
-Stonesoup.
+Red Hat Trusted Application Pipeline.
 
 Uses Asciidoc and Antora.
 
