@@ -1,12 +1,14 @@
 
-= Getting started with Enterprise Contract and Red Hat Trusted Application Pipeline
+= Getting started with Enterprise Contract & Red Hat Trusted Application Pipeline
 
-In this guide I'll create a new application, create an integration test to run
-the Enterprise Contract, examine its results, and then customize the default
-configuration.
+This guide describes creating a new application, creating an integration test
+to run the Enterprise Contract, examining its results, and customizing the
+Enterprise Contract configuration.
 
-I'm working with a real example application on the current (March 28, 2023)
-"beta" version of RHTAP.
+The screenshots and example output are based on real sample application created
+on the current (March 28, 2023) "beta" version of RHTAP.
+
+IMPORTANT: Please see the important notes xref::index.adoc[here].
 
 == Creating an application
 
@@ -14,21 +16,22 @@ Visit the following url:
 
 - https://console.redhat.com/beta/hac/stonesoup
 
-NOTE: I presume in the near future the url will be changed so it's no longer
-`stonesoup` and also the title "CI/CD" might be changed to Red Hat Trusted
-Application Pipeline or RHTAP.
-
 .Main home page for RHTAP
 image::e5e0649bef55946c51024076772bb941.png[]
+
+NOTE: Presumably in the near future the url will be changed so it no longer
+refers to the `stonesoup` code name, and also the title "CI/CD" might be
+changed to Red Hat Trusted Application Pipeline or RHTAP.
 
 Click on "+ Create an application".
 
 .Create application form
 image::a2881d0be7b18acc6dec6b5e0558174c.png[]
 
-For this example, I'll use my own fork of the node sample app, specifically
-link:https://github.com/simonbaird/devfile-sample[this one]. I left the
-application name as the default `my-app`.
+Choose an application name and add the GitHub url for your project. In this
+example a NodeJS sample app was used, specifically
+link:https://github.com/simonbaird/devfile-sample[this one], and the
+application name was left as the default value, `my-app`.
 
 .Application creation screen
 image::a7144c5b891cdef08962bc90e114715d.png[]
@@ -36,7 +39,9 @@ image::a7144c5b891cdef08962bc90e114715d.png[]
 .Configuring components
 image::641d165592d5e23c6ff37eafa608697c.png[]
 
-I chose "Custom build", and reached this screen.
+"Custom Build" is needed to run the tests that Enterprise Contract expects to
+see, so chose "Custom build". Unless you have the GitHub Application installed
+already you should reach this screen.
 
 .Pull request failed
 image::1bc92e831cedeee41a7603e242550599.png[]
@@ -47,7 +52,7 @@ permissions screen.
 .GitHub application install
 image::78643d04353be73afcbcecf331945fa4.png[]
 
-Trying the pull request again:
+Trying to create the pull request again:
 
 .Pull request created
 image::babfa40534d85e2aac76f7f352ba3a1d.png[]
@@ -72,10 +77,10 @@ A short time later the build is complete:
 .Initial build complete
 image::e98385fa1da51a13cb151abdaad52577.png[]
 
-NOTE: All of the above is a pretty standard guide to creating an app, so it
-might be already covered by other documentation. Potentially it could be
-removed from this page entirely and this particular guide could start from the
-next section.
+NOTE: All of the above is a pretty standard guide to creating an application
+with RHTAP, so it might be already covered by other documentation. Potentially
+it could be removed from this page entirely and this particular guide could
+start from the next section.
 
 
 == Adding an Integration Test to run Enterprise Contract
@@ -100,31 +105,28 @@ Fill in the details as follows:
 
 Integration test name:: Use whatever you like for the name. I called mine `check-contract`
 
-Image bundle:: `quay.io/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract:devel`
+Image bundle:: Should be `quay.io/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract:devel`
 
-Pipeline to run:: `enterprise-contract`. Must be exactly correct, since this is the name of the pipeline definition in the tekton bundle.
+Pipeline to run:: Should be `enterprise-contract` since that is the name of the pipeline definition in the Tekton bundle specified above.
 
-Optional for release:: It's up to you, but I left it unchecked to indicate that I don't want to
-release anything that is failing the policy check.
+Optional for release:: Leave this unchecked to indicate that you don't want to
+release anything that is failing the Enterprise Contract policy check.
 
-[TIP]
-====
-- The source for the Tekton pipeline defined in that bundle is
-  link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml[here
-  in the build-definitions repo].
-- The source the the Tekton task used by that pipeline is in a different place. It is
-  link:https://github.com/enterprise-contract/ec-cli/blob/main/tasks/verify-enterprise-contract/0.1/verify-enterprise-contract.yaml[here
-  in the ec-cli repo].
-- If you prefer to pin the pipeline bundle to a particular version, instead of using the `devel` tag, use one of the pinned tags
-  link:https://quay.io/repository/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract?tab=tags[visible here]. Note that the
-  name of the tag matches a commit sha in the link:https://github.com/redhat-appstudio/build-definitions[build-definitions repo].
-- I presume you could also use a container image digest to pin it more securely.
-====
+TIP: The source for the Tekton pipeline defined in that bundle is
+link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml[here
+in the build-definitions repo]. The source the the Tekton task used by that pipeline is
+link:https://github.com/enterprise-contract/ec-cli/blob/main/tasks/verify-enterprise-contract/0.1/verify-enterprise-contract.yaml[here
+in the ec-cli repo].
+
+TIP: If you prefer to pin the pipeline bundle to a particular version, instead of using the `devel` tag, use one of the pinned tags
+link:https://quay.io/repository/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract?tab=tags[visible here].
+Note that the name of the tag matches a commit sha in the link:https://github.com/redhat-appstudio/build-definitions[build-definitions repo].
+You could also use a container image digest to pin it more securely.
 
 NOTE: In the near future it will be possible to use a git resolver to specify
 the pipeline definition instead of the tekton bundle image ref. It's expected
-that will be the preferred way to do it. I'll update these docs to demonstrate
-that as soon as it's available.
+that will become the preferred way to specify the pipeline. These docs should
+be updated to demonstrate that as soon as the git resolved is available.
 
 With the fields populated, hit the "Add Integration Test" button:
 
@@ -136,15 +138,15 @@ image::988492c60644c1a33e81fde03def8a1c.png[]
 
 == Running the newly created Integration Test
 
-NOTE: I don't believe there's any way to trigger the new Integration Test other
-than by pushing a new commit to the application component's source repo, which
-triggers a full rebuild of the component. It would be nice if it were possible
-to manually trigger this pipeline, especially when experimenting with different
-Enterprise Contract policies.
+NOTE: As far as I know there's currently no way to trigger the new Integration
+Test other than by pushing a new commit to the application component's source
+repo, which triggers a full rebuild of the component. It would be nice if it
+were possible to manually trigger this pipeline, especially when experimenting
+with different Enterprise Contract policies.
 
 To trigger a rebuild, make a commit in the GitHub repo for the component.
-link:https://github.com/simonbaird/devfile-sample/commit/e9913e9c4faa4a6a2168d605b73029af5d2db4d9[Here
-is mine].
+(link:https://github.com/simonbaird/devfile-sample/commit/e9913e9c4faa4a6a2168d605b73029af5d2db4d9[Here
+is mine].)
 
 This should trigger a new build-pipeline, and when that's done, the newly
 created Integration Test pipeline should be triggered.
@@ -158,8 +160,8 @@ image::943596175af7d0f1cf533f4d31ddbd4c.png[]
 NOTE: I was expecting this to pass. The failure is due to a known bug with the
 clair test, see
 link:https://issues.redhat.com/browse/STONEINTG-373[STONEINTG-373]. Rather than
-wait for the fix to be merged, I'll use the opportunite to demonstrate
-customizing the Enterprise Contract configuration to skip the known false
+wait for the fix to be merged, I'll use the opportunity to demonstrate
+customizing the Enterprise Contract configuration to skip this known false
 positive.
 
 From the logs we can see the reason for the failure:
@@ -193,23 +195,26 @@ configuration, and what steps are required to modify it.
 
 == Inspecting the Enterprise Contract results
 
-Let's take a closer look at the EC contract output and the configuration used.
+Let's take a closer look at the output produced by the Enterprise Contract and
+the configuration it used.
 
 === Command line credentials
 
-We want to access the cluster using kubectl and oc, so let's get the credentials for that.
+We want to access the cluster using `kubectl` or `oc`, so let's get some credentials to allow that.
 
 The link to get a token is link:https://registration-service-toolchain-host-operator.apps.stone-stg-host1.hjvn.p1.openshiftapps.com/[this one].
 Authenticate, then click the "Proxy login command" link in the top right.
+
+NOTE: Will it always be that url? Is there some way to discover what the URL is in case you don't know it in advance?
 
 .Copying the 'oc login --token...' command
 image::1905b130f55b1c3fa72b310ce0bd8ce3.png[]
 
 Paste the login command in your terminal and you should logged in to the cluster.
 
-[,bash]
+[,bash,subs="+quotes"]
 ----
-$ oc login --token=<very-long-token> --server=<server-url>
+$ oc login --token=__<very-long-token>__ --server=__<server-url>__
 Logged into "https://api-toolchain-host-operator.apps.stone-stg-host1.hjvn.p1.openshiftapps.com:443" as "sbaird" using the token provided.
 
 You have one project on this server: "sbaird-tenant"
@@ -218,16 +223,17 @@ Using project "sbaird-tenant".
 ----
 
 NOTE: This token expires in a unexpectedly short amount of time, so you may
-need to do this repeatedly. Would it be possible to adjust timeout longer,
-perhaps an hour instead of whatever it is now? (It feels like five or ten
-minutes.) There is a
+need to do this repeatedly.
+
+NOTE: Would it be possible to adjust timeout longer, perhaps an hour instead of
+whatever it is now? It feels like it's currently five or ten minutes. There is a
 link:https://docs.google.com/document/d/1hFvQDH1H6MGNqTGfcZpyl2h8OIaynP8sokZohCS0Su0/edit#heading=h.cs6a0cjzoq2d[workaround
 suggestion here] FWIW.
 
-Here's some commands to extract the Enterprise Contract output. (This works
-conveniently if the integration test is the most recent PipelineRun, but it
-should be easy enough to adapt the commands as required if that is not the
-case.)
+Here are some commands to extract the Enterprise Contract output. These
+commands works conveniently if the integration test is the most recent
+PipelineRun, but it should be easy enough to adapt the commands as required if
+that is not the case.
 
 [,bash]
 ----
@@ -236,10 +242,16 @@ POD_NAME=$( kubectl get $PR_NAME -o yaml | yq .status.taskRuns.[].status.podName
 kubectl logs -c step-validate $POD_NAME
 ----
 
-NOTE: This works but it's a little clunky. Is there an easier way to access the
-TaskRun log?
+NOTE: If you need to install `yq` follow the instructions
+link:https://github.com/mikefarah/yq/#install[here].
 
-NOTE: I thought it would be possible to use `tkn` here, but I get an error,
+NOTE: Perhaps there a simpler, easier way to access the TaskRun log. Copying
+the raw logs from the web UI would be an alternative way to do it, but for now
+I'm trying to use command lines that are easy to copy/paste.
+
+[NOTE]
+====
+I thought it would be possible to use `tkn` here, but I get an error,
 perhaps because the pipeline definition is not visible. Is that expected?
 
 [,bash]
@@ -247,8 +259,10 @@ perhaps because the pipeline definition is not visible. Is that expected?
 $ tkn pr logs my-app-qcrsw-5pwk6
 Error: pipelines.tekton.dev "enterprise-contract" not found
 ----
+====
 
-The EC output is YAML so you can select pieces of it using the yq command. For example, this produces a list of the violations:
+The EC output is YAML so you can select pieces of it using the `yq` command. For
+example, this produces a list of the violations:
 
 [,bash]
 ----
@@ -263,7 +277,8 @@ $ kubectl logs -c step-validate $POD_NAME | yq .components.[].violations
   msg: CVE scan results not found
 ----
 
-To create a custom configuration for EC, it's useful to extract the current (default) configuration.
+To create a custom configuration for EC, it's useful to extract the
+configuration being used currently, i.e. the default configuration.
 
 Let's do that as follows:
 
@@ -294,19 +309,26 @@ sources:
 TIP: The default EC policies for RHTAP are defined
 link:https://github.com/redhat-appstudio/infra-deployments/blob/main/components/enterprise-contract/ecp.yaml[here in the infra-deployments repo].
 
-For verifying signatures the public key might be useful. We can extract that
-from the output also like this:
+[TIP]
+====
+For verifying image and attestation signatures the public key is useful. We can
+extract that from the output also like this:
 
 [,bash]
 ----
 $ kubectl logs -c step-validate $POD_NAME | yq .key > rhtap-signing-key.pub
 ----
 
+This method of extracting the public key is probably easier than the methods
+described in xref::cosign.adoc[here] and xref::custom-data.adoc[here]. If we
+think this is acceptable as the preferred method we should revise those docs.
+====
+
 === The IntegrationTestScenario record
 
-Let's also look at the Integration Test Scenario. This is the record that
-corresponds to the integration test visible under the "Integration Tests". In
-my case it's called `check-contract`.
+Let's also look at the IntegrationTestScenario record. This is the record that
+corresponds to the integration test visible under the "Integration Tests" tab.
+In this example it's called `check-contract`.
 
 Listing all the IntegrationTestScenario records:
 
@@ -342,22 +364,20 @@ status:
       type: IntegrationTestScenarioValid
 ----
 
-Inspecting the ec-policy-check IntegrationTestScenario record.
+NOTE: Notice the `bundle` and the `pipeline` values which were initially
+entered via the UI. Later we'll be modifying this record to add some params
+that will be passed to the integration test pipeline.
 
-NOTE: In this example I'm filtering out the majority of the metadata since it's
-not particularly interesting for the purposes of these docs.
-
-Actually there's not a lot to pay attention to here. Notice the `bundle` and the
-`pipeline` which were initially entered via the UI. Later we'll be modifying this
-record to add some params that will be passed to the integration test pipeline.
+NOTE: In the above example we're filtering out the majority of the metadata
+since it's not particularly interesting or relevant for this documentation.
 
 == Customizing the Enterprise Contract
 
 === Creating a custom ECP record
 
-We'll initially use the same configuration as the default ECP.
+We'll start with the same configuration as the default ECP and then modify it.
 
-Create a yaml file call `ecp.yml` with the following content:
+Create a stub yaml file call `ecp.yml` with the following content:
 
 [,yaml]
 ----
@@ -370,15 +390,19 @@ metadata:
 We'll add the default configuration with some yq commands. (You could also do
 this manually with a text editor.)
 
+The `ec-policy.yml` file is the one we produced earlier with `kubectl logs -c
+step-validate $POD_NAME | yq .policy > ec-policy.yaml`. The data in that file
+will be placed under the `spec` key.
+
 [,bash]
 ----
 cat ecp.yml | yq ".spec |= $(yq ec-policy.yml -ojson -I0)" > my-ec-policy.yml
 cat my-ec-policy.yml
 ----
 
-Let's edit the new `my-ec-policy.yml` file. I'll modify the description and add
+Let's edit the new `my-ec-policy.yml` file. Modify the description and add
 an `exclude` option designed to skip all the `cve` rules. After editing the
-`my-ec-policy.yml` file looks like this:
+`my-ec-policy.yml` file it should look like this:
 
 [,yaml]
 ----
@@ -412,8 +436,8 @@ $ kubectl apply -f my-ec-policy.yml
 enterprisecontractpolicy.appstudio.redhat.com/ec-policy configured
 ----
 
-We now have a customized ECP record in our namespace. The next step is to
-modify the IntegrationTestScenario record to tell it to use that configuration.
+The next step is to modify the IntegrationTestScenario record to tell it to use
+that configuration.
 
 NOTE: I didn't really explain why I chose `cve.*` to exclude. The reason is
 that I wanted to skip all the rules in the
@@ -422,22 +446,34 @@ package]. Skipping just `cve.missing_cve_scan_results` might have also worked.
 
 === Modifying the IntegrationTestScenario record
 
-NOTE: It would be nice if this could be done via the web UI. Perhaps there
-could be a general way to modify the params for an IntegrationTestScenario.
+We need to add a parameter called POLICY_CONFIGURATION that will be used when
+the Integration Test pipeline is started. I'll use `yq` and `kubectl apply` to
+do that:
 
 [,bash]
 ----
 $ kubectl get IntegrationTestScenario check-contract -o yaml | yq '.spec.params |= [{"name":"POLICY_CONFIGURATION","value":"ec-policy"}]' | kubectl apply -f -
 ----
 
-NOTE: I get a warning using kubectl apply like this, since the original CR doesn't have the expected annotations. Is there a more
-standard way to patch a CR that would avoid the warning. I guess `kubectl edit` would work here, but it's harder to document.
+NOTE: I get a warning using `kubectl apply` like this, since the original CR
+doesn't have the annotations that the apply command expects to see. Is there a
+more standard way to patch a CR that would avoid the warning? Using `kubectl
+edit IntegrationTestScenario check-contract` would work here, but it's a little
+harder to document clearly.
+
+NOTE: It would be nice if this could be done via the web UI. Perhaps in future
+there could be a way to set or modify params for any IntegrationTestScenario
+via the UI.
 
 Taking a look at the modified IntegrationTestScenario spec:
 
 [,bash]
 ----
 $ kubectl get IntegrationTestScenario check-contract -o yaml | yq .spec
+----
+
+[,yaml]
+----
 application: my-app
 bundle: quay.io/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract:devel
 contexts:
@@ -449,7 +485,7 @@ params:
 pipeline: enterprise-contract
 ----
 
-Notice that the value of the POLICY_CONFIGURATION param that we just added is
+Notice that the value of the `POLICY_CONFIGURATION` param that we just added is
 "ec-policy" which is the name of our custom ECP CR. The following command
 should display the ECP CR that we created earlier:
 
@@ -458,26 +494,28 @@ should display the ECP CR that we created earlier:
 $ kubectl get EnterpriseContractPolicy ec-policy -o yaml
 ----
 
-At this point we should be ready to re-run the Integration Test.
+At this point we are ready to re-run the Integration Test with the customized EC policy.
 
-== Running the Integration Test again with the customized EC policy
+== Re-running EC with the customized policy
 
 To re-run the Integration Test we need to trigger a build. As before, we'll do
-that by making a commit in the source repo. To save time I'm again commiting
-directly to main branch via the GitHub web UI. The commit is
-link:https://github.com/simonbaird/devfile-sample/commit/2edbaceb46dfa0ca396017d2b1000acfffe7f68e[here].
+that by making a commit in the source repo. (For my example I'm again
+link:https://github.com/simonbaird/devfile-sample/commit/2edbaceb46dfa0ca396017d2b1000acfffe7f68e[commiting]
+directly to main branch via the GitHub web UI.)
 
-The commit triggers a new build. Notice the "Tests" is still marked as failing.
+The commit triggers a new build as expected.
 
 .New Build running
 image::e0e2e21b85c6de07ecca12d297fb03a6.png[]
 
-Once the build is finished, the Integration Test is triggered and this time it's green.
+Notice that "Tests" is still marked as failing.
+
+Once the build is finished, the Integration Test is triggered and this time it's green:
 
 .Integration Test passing
 image::a3ae12d95c63c572285c5d42f24dc75e.png[]
 
-Let's confirm that it's working as we expected. Firstly, if we view the
+Let's confirm that it's working as expected. Firstly, if we view the
 Integration Test and click the "Pipeline Runs" tab, we can see the new pipline run.
 
 .Integration Test pipeline runs
@@ -488,7 +526,6 @@ If we take a look at the logs we can see that the overall `success` value is
 
 .Enterprise Contract task logs
 image::775c93da5e37035e14fa6629d3c2a876.png[]
-
 
 == Using the full set of policies
 
@@ -510,6 +547,10 @@ $ kubectl get EnterpriseContractPolicy ec-policy -o yaml  | yq '.spec.configurat
 $ kubectl get EnterpriseContractPolicy ec-policy -o yaml  | yq '.spec.description |= "Include all rules"' | kubectl apply -f -
 
 $ kubectl get EnterpriseContractPolicy ec-policy -o yaml | yq .spec
+----
+
+[,yaml]
+----
 configuration:
   include:
     - '*'
@@ -523,24 +564,43 @@ sources:
       - oci::quay.io/hacbs-contract/ec-release-policy:git-d995f67@sha256:9d2cffae5ed8a541b4bff1acbaa9bb0b42290214de969e515e78f97b8cf8ff51
 ----
 
-[NOTE]
-====
-- "All rules" here means effectively all the rules defined in the
-  `quay.io/hacbs-contract/ec-release-policy` bundle which is defined under `sources`.
-  Those rules are described link:https://enterprise-contract.github.io/ec-policies/release_policy.html[here].
-  You can also write your own custom rules but we don't have good documentation for that yet.
-  If you want some pointers, feel free to ask questions on the `#stonesoup-users` Red Hat slack channel.
-- Setting `configuration` to just `{}` would also work to apply all the rules, but I think using
-  an include with a wildcard helps express the intention better.
-====
+NOTE: "All rules" here means effectively all the rules defined in the
+`quay.io/hacbs-contract/ec-release-policy` bundle which is defined under
+`sources`. Those rules are described link:https://enterprise-contract.github.io/ec-policies/release_policy.html[here].
+You can also write your own custom rules but we don't have good documentation
+for that yet. If you want some pointers, feel free to ask questions on the
+`#stonesoup-users` Red Hat slack channel.
+
+NOTE: Setting `configuration` to just `{}` would also work to apply all the
+rules, but I think using an include with a wildcard helps express the intention
+better.
+
+You could also select the minimal plus the three SLSA level collections by
+setting the configuration like this:
+
+[,yaml]
+----
+...
+  include:
+    - "@minimal"
+    - "@slsa1"
+    - "@slsa2"
+    - "@slsa3"
+...
+----
+
+NOTE: Beware that the SLSA collection rules are currently based on the v0.1 of the
+SLSA spec, which is a little different to the recently updated SLSA v1.0 draft.
+See link:https://enterprisecontract.dev/ec-policies/release_policy.html#_available_rule_collections[these docs]
+for information on what rules are included in each collection.
 
 === Triggering another build
 
-Notice there's no need to modify the IntegrationTestScenario record now, since it's already pointing to our customized ECP CR.
+There's no need to modify the IntegrationTestScenario record now, since it's already pointing to our customized ECP CR.
 
-Trigger a new build by making a bogus commit once again.
+Trigger a new build by making a commit in the source repo once again.
 
-.A new build running
+.The new build running
 image::26ccaa4bfcd422ebe86ca01688fe58aa.png[]
 
 With all the rules enabled, I'm expecting the Integration Test to be failing again.
@@ -557,6 +617,9 @@ Let's extract all the failures on the command line:
 $ PR_NAME=$( kubectl get pipelinerun -o name --sort-by='.status.startTime' | tail -1 )
 $ POD_NAME=$( kubectl get $PR_NAME -o yaml | yq .status.taskRuns.[].status.podName )
 $ kubectl logs -c step-validate $POD_NAME | yq .components.[].violations.[].msg
+----
+
+----
 Pipeline task 'build-container' uses an unacceptable task bundle 'quay.io/redhat-appstudio-tekton-catalog/task-buildah:0.1@sha256:c3712257615d206ef40013bf1c5c681670fc8f7fd6aac9fa4c86f7afeff627ef'
 Pipeline task 'init' uses an unacceptable task bundle 'quay.io/redhat-appstudio-tekton-catalog/task-init:0.1@sha256:5ce77110e2a49407a69a7922042dc0859f7e8f5f75dc0cd0bcc2d17860469bdb'
 CVE scan results not found
@@ -567,12 +630,6 @@ Test "clair-scan" did not complete successfully
 Test "sanity-label-check" did not complete successfully
 ----
 
-[NOTE]
-====
-- Describing how to debug and fix all these EC violations is left for another day.
-- Of all the errors listed above, the "unacceptable task bundle" seems the most unintuitive, so we may need some specific documentation describing acceptable bundle concepts.
-====
-
 We can also look at warnings and successes, for example:
 
 [,bash]
@@ -580,3 +637,10 @@ We can also look at warnings and successes, for example:
 $ kubectl logs -c step-validate $POD_NAME | yq .components.[].warnings
 $ kubectl logs -c step-validate $POD_NAME | yq .components.[].successes
 ----
+
+NOTE: Describing how to debug and fix all these EC violations is left for
+another day.
+
+NOTE: Of all the errors listed above, the "unacceptable task bundle" seems the
+most unintuitive, so we may need some specific documentation describing
+the acceptable bundle concepts.
