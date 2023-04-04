@@ -284,8 +284,8 @@ Let's do that as follows:
 
 [,bash]
 ----
-$ kubectl logs -c step-validate $POD_NAME | yq .policy > ec-policy.yaml
-$ cat ec-policy.yaml
+$ kubectl logs -c step-validate $POD_NAME | yq .policy > ec-policy.yml
+$ cat ec-policy.yml
 ----
 
 [,yaml]
@@ -394,7 +394,7 @@ We'll add the default configuration with some yq commands. (You could also do
 this manually with a text editor.)
 
 The `ec-policy.yml` file is the one we produced earlier with `kubectl logs -c
-step-validate $POD_NAME | yq .policy > ec-policy.yaml`. The data in that file
+step-validate $POD_NAME | yq .policy > ec-policy.yml`. The data in that file
 will be placed under the `spec` key.
 
 [,bash]
