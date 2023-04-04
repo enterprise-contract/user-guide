@@ -202,7 +202,7 @@ the configuration it used.
 
 We want to access the cluster using `kubectl` or `oc`, so let's get some credentials to allow that.
 
-The link to get a token is link:https://registration-service-toolchain-host-operator.apps.stone-stg-host1.hjvn.p1.openshiftapps.com/[this one].
+The link to get a token is link:https://registration-service-toolchain-host-operator.apps.stone-prd-host1.wdlc.p1.openshiftapps.com/[this one].
 Authenticate, then click the "Proxy login command" link in the top right.
 
 NOTE: Will it always be that url? Is there some way to discover what the URL is in case you don't know it in advance?
