@@ -23,6 +23,11 @@ NOTE: Presumably in the near future the url will be changed so it no longer
 refers to the `stonesoup` code name, and also the title "CI/CD" might be
 changed to Red Hat Trusted Application Pipeline or RHTAP.
 
+NOTE: This guide assumes access to the RHTAP beta. To request access, you'll
+need to join the waitlist from the homepage, then send a message in the
+link:https://rhdevnation.slack.com/archives/C04LXT1EU7K[#software-supply-chain-security]
+channel on the DevNation Slack affirming that you've joined the waitlist.
+
 Click on "+ Create an application".
 
 .Create application form
@@ -52,7 +57,8 @@ permissions screen.
 .GitHub application install
 image::78643d04353be73afcbcecf331945fa4.png[]
 
-Trying to create the pull request again:
+Once authenticated with GitHub, you'll need to click the button to create a
+pull request again:
 
 .Pull request created
 image::babfa40534d85e2aac76f7f352ba3a1d.png[]
@@ -67,7 +73,8 @@ After merging the PR, the UI updates to show that it was merged:
 .Upgraded to custom build
 image::f555aa90630e887aa3c5fb757666a694.png[]
 
-A build is triggered by the merge:
+Close the "Manage build pipelines" window, and you should see that a build was
+triggered by the merge:
 
 .Initial build started
 image::1a3e631c2d19eef09fe15c8fa89ea65e.png[]
@@ -200,9 +207,12 @@ the configuration it used.
 
 === Command line credentials
 
-We want to access the cluster using `kubectl` or `oc`, so let's get some credentials to allow that.
+We want to access the cluster using `kubectl` or `oc`. If you don't have
+either, here are installation instructions for link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[`kubectl`]
+and link:https://docs.openshift.com/container-platform/4.12/cli_reference/openshift_cli/getting-started-cli.html[`oc`].
 
-The link to get a token is link:https://registration-service-toolchain-host-operator.apps.stone-prd-host1.wdlc.p1.openshiftapps.com/[this one].
+Next, you'll need to get credentials to access the cluster. The link to get a
+token is link:https://registration-service-toolchain-host-operator.apps.stone-prd-host1.wdlc.p1.openshiftapps.com/[here].
 Authenticate, then click the "Proxy login command" link in the top right.
 
 NOTE: Will it always be that url? Is there some way to discover what the URL is in case you don't know it in advance?
