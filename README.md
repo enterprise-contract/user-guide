@@ -1,7 +1,7 @@
 Enterprise Contract Cookbook
 ============================
 
-Some high level documentation on how to use and configure Enterprise in
+Some high level documentation on how to use and configure Enterprise Contract in
 Red Hat Trusted Application Pipeline.
 
 Uses Asciidoc and Antora.
