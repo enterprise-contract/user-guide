@@ -4,3 +4,4 @@
 * xref:cosign.adoc[Using Cosign]
 * xref:cli.adoc[Command line EC]
 * xref:custom-data.adoc[Using custom data]
+* xref:slsa.adoc[SLSA]
