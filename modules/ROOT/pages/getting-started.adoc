@@ -249,7 +249,7 @@ that is not the case.
 ----
 PR_NAME=$( kubectl get pipelinerun -o name --sort-by='.status.startTime' | tail -1 )
 POD_NAME=$( kubectl get $PR_NAME -o yaml | yq .status.taskRuns.[].status.podName )
-kubectl logs -c step-validate $POD_NAME
+kubectl logs -c step-report $POD_NAME
 ----
 
 NOTE: If you need to install `yq` follow the instructions
@@ -276,7 +276,7 @@ example, this produces a list of the violations:
 
 [,bash]
 ----
-$ kubectl logs -c step-validate $POD_NAME | yq .components.[].violations
+$ kubectl logs -c step-report $POD_NAME | yq .components.[].violations
 - metadata:
     code: cve.missing_cve_scan_results
     collections:
@@ -294,7 +294,7 @@ Let's do that as follows:
 
 [,bash]
 ----
-$ kubectl logs -c step-validate $POD_NAME | yq .policy > ec-policy.yml
+$ kubectl logs -c step-report $POD_NAME | yq .policy > ec-policy.yml
 $ cat ec-policy.yml
 ----
 
@@ -329,7 +329,7 @@ extract that from the output also like this:
 
 [,bash]
 ----
-$ kubectl logs -c step-validate $POD_NAME | yq .key > rhtap-signing-key.pub
+$ kubectl logs -c step-report $POD_NAME | yq .key > rhtap-signing-key.pub
 ----
 
 This method of extracting the public key is probably easier than the methods
@@ -404,7 +404,7 @@ We'll add the default configuration with some yq commands. (You could also do
 this manually with a text editor.)
 
 The `ec-policy.yml` file is the one we produced earlier with `kubectl logs -c
-step-validate $POD_NAME | yq .policy > ec-policy.yml`. The data in that file
+step-report $POD_NAME | yq .policy > ec-policy.yml`. The data in that file
 will be placed under the `spec` key.
 
 [,bash]
@@ -629,7 +629,7 @@ Let's extract all the failures on the command line:
 ----
 $ PR_NAME=$( kubectl get pipelinerun -o name --sort-by='.status.startTime' | tail -1 )
 $ POD_NAME=$( kubectl get $PR_NAME -o yaml | yq .status.taskRuns.[].status.podName )
-$ kubectl logs -c step-validate $POD_NAME | yq .components.[].violations.[].msg
+$ kubectl logs -c step-report $POD_NAME | yq .components.[].violations.[].msg
 ----
 
 ----
@@ -647,8 +647,8 @@ We can also look at warnings and successes, for example:
 
 [,bash]
 ----
-$ kubectl logs -c step-validate $POD_NAME | yq .components.[].warnings
-$ kubectl logs -c step-validate $POD_NAME | yq .components.[].successes
+$ kubectl logs -c step-report $POD_NAME | yq .components.[].warnings
+$ kubectl logs -c step-report $POD_NAME | yq .components.[].successes
 ----
 
 NOTE: Describing how to debug and fix all these EC violations is left for
