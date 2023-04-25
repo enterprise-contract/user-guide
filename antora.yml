@@ -1,5 +1,5 @@
-name: ec-cookbook
-title: EC Cookbook
+name: user-guide
+title: User Guide
 version: main
 nav:
 - modules/ROOT/nav.adoc
