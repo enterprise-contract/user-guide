@@ -1,6 +1,6 @@
 
 * xref:index.adoc[Introduction]
-* xref:getting-started.adoc[Getting started with Enterprise Contract & RHTAP]
-* xref:cosign.adoc[Cosign & RHTAP]
-* xref:cli.adoc[Using the EC command line]
+* xref:getting-started.adoc[Getting started]
+* xref:cosign.adoc[Using Cosign]
+* xref:cli.adoc[Command line EC]
 * xref:custom-data.adoc[Using custom data]
