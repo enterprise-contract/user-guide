@@ -134,7 +134,7 @@ made available in the SLSA attestation created by Tekton Chains.
 This is not a limitation of EC itself, but rather just an attribute of the
 xref:ec-policies:ROOT:release_policy.adoc[policies created for RHTAP] in their
 current state. In future we're aiming to extract the Tekton specific rules from
-the general SLSA rules to make the rules more generally applicable. It's expected
+the general SLSA rules to make the rules more generally applicable. We expected
 that policy rules for build systems not based on Tekton and Tekton Chains could
 be created easily.
 
