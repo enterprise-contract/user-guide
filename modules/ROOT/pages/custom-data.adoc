@@ -435,3 +435,96 @@ components:
     signatures: ...
 key: ...
 ----
+
+== Adding a custom policy source
+Now imagine your organization has a need for a custom policy. A policy that doesn't exactly fit in
+with the default. The solution is to create a custom policy repo and apply that to your next EC run.
+
+=== Creating the custom policy source
+To create a custom policy, we'll start by creating a git repo for it.
+If you don't have a git repo created already, let's start by creating one. If you do, start by creating the file 
+`policy/myorg.rego` with the content below.
+
+[.console-input]
+[source, bash]
+----
+mkdir ec-data-demos
+cd ec-data-demos/
+git init .
+git remote add origin git@github.com:joejstuart/ec-data-demos.git # Repo created in GitHub already
+mkdir policy/
+vi policy/myorg.rego # Use content from below
+git policy/myorg.rego
+git commit -m "Add custom task policy"
+git push origin main
+----
+
+.policy/myorg.rego
+[source, rego]
+----
+#
+# METADATA
+# description: |-
+#   Verify "myorg-task" does not exist in a build
+#
+package policy.myorg
+
+import future.keywords.contains
+import future.keywords.if
+import future.keywords.in
+
+import data.lib
+
+
+# METADATA
+# title: myorg-task does not exist
+# description: |-
+#   This policy enforces that a task named "myorg-task" does not exist in a build
+# custom:
+#   short_name: myorg_task_missing
+#   failure_msg: myorg-task missing from build pipeline
+deny contains result if {
+  count({task | some task in input.predicate.buildConfig.tasks; task.name == "myorg-task"}) == 0
+  result := lib.result_helper(rego.metadata.chain(), [])
+}
+----
+The above policy will throw a violation if a task named `myorg-task` is not found in the build. 
+
+=== Configuring EC to use the custom policy source
+Let's modify the `policy.yml` file to add an extra policy source:
+
+.policy.yaml
+[source, yaml]
+----
+configuration:
+  exclude:
+    - hermetic_build_task.build_task_not_hermetic
+    - tasks.missing_required_task:prefetch-dependencies
+    - tasks.missing_required_task:sast-snyk-check
+    - test.test_result_failures:sanity-label-check
+sources:
+  - data:
+      - oci::quay.io/hacbs-contract/ec-policy-data:latest
+    policy:
+      - oci::quay.io/hacbs-contract/ec-release-policy:latest
+      - git::https://github.com/joejstuart/ec-policy-demo//policy
+----
+TIP: The data source `oci::quay.io/hacbs-contract/ec-policy-data:latest` will give you access to some very useful helper methods.
+For instance, `lib.result_helper(rego.metadata.chain(), [])` collects information from the `custom` annotation and uses it in the 
+`ec-cli` output. This can be helpful debugging violations.
+
+Now let's run ec again:
+
+[.console-input]
+[source, bash]
+----
+ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P '.components.[].violations.[].msg'
+----
+.`ec validate image` output
+[source, yaml]
+----
+- msg: myorg-task missing from build pipeline
+  metadata:
+    code: myorg.myorg_task_missing
+----
+Now, in the output you can see there is a new violation. Our build does not contain a task named 'myorg-task'.
