@@ -459,6 +459,7 @@ git commit -m "Add custom task policy"
 git push origin main
 ----
 
+.policy/myorg.rego
 [source, rego]
 ----
 #
@@ -492,6 +493,7 @@ The above policy will throw a violation if a task named `myorg-task` is not foun
 === Configuring EC to use the custom policy source
 Let's modify the `policy.yml` file to add an extra policy source:
 
+.policy.yaml
 [source, yaml]
 ----
 configuration:
@@ -518,6 +520,7 @@ Now let's run ec again:
 ----
 ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P '.components.[].violations.[].msg'
 ----
+.`ec validate image` output
 [source, yaml]
 ----
 - msg: myorg-task missing from build pipeline
