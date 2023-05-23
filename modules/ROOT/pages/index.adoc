@@ -1,23 +1,13 @@
 
-= User Guide
+= Enterprise Contract User Guide
 
-:numbered:
+This documentation will describe how to use Enterprise Contract, particularly
+with Red Hat Trusted Application Pipeline (RHTAP).
 
-These docs are intended to describe how to configure and use Enterprise
-Contract with Red Hat Trusted Application Pipeline (RHTAP).
+See also the
+link:https://redhat-appstudio.github.io/docs.stonesoup.io/Documentation/main/[App
+Studio Documentation].
 
-Rather than describe the low-level components of EC, this will focus on
-high-level user interactions with Enterprise Contract via RHTAP.
+== Contents
 
-These docs may be folded in to an RHTAP User Guide in the future.
-
-IMPORTANT: The Enterprise Contract and RHTAP are evolving rapidly.
-We'll aim to keep this documentation current, but beware that parts of this
-documentation may become out of date quickly.
-
-IMPORTANT: This documentation includes notes and comments that are not suitable
-for inclusion in customer-facing documentation. This content could be adapted
-for use in customer-facing docs, but currently it's not suitable for that
-purpose.
-
-Continue to xref:getting-started.adoc[Getting started with Enterprise Contract and RHTAP].
+include::partial$contents.adoc[]

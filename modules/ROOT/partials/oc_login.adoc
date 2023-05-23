@@ -1,0 +1,3 @@
+Follow the procedure for accessing the RHTAP cluster via the `oc` command line
+client link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/getting-started/getting_started_in_cli/[as
+described here].
