@@ -1,0 +1,155 @@
+
+= Using custom configuration
+
+== Accessing the RHTAP cluster using `oc` or `kubectl`
+
+include::partial$oc_login.adoc[]
+
+You can then view the integration test scenario CRs, for example:
+
+[,shell,subs="+quotes"]
+----
+$ oc get integrationtestscenario
+$ oc get integrationtestscenario __<testname>__ -o yaml
+----
+
+== Adding the policy configuration parameter
+
+A convenient method of modifying a CR is to use the `oc edit` command.
+
+Determine the name of the integration test you want to modify, then run the following:
+
+[,shell,subs="+quotes"]
+----
+$ oc edit integrationtestscenario __<testname>__
+----
+
+Find the `spec` key and add `params` underneath it like this:
+
+[,yaml,subs="+quotes"]
+----
+…
+spec:
+  params:
+    - name: POLICY_CONFIGURATION
+      value: github.com/enterprise-contract/config//slsa3
+…
+----
+
+The `params` key should be at the same indent level as `application` and
+`contexts` underneath the `spec` key.
+
+Before saving the YAML file, to workaround a problem with the API versions
+present in the cluster, you also need to also modify the API version to change
+`v1beta1` to `v1alpha1` in the first line of the YAML file.
+
+[,yaml]
+----
+apiVersion: appstudio.redhat.com/v1alpha1
+----
+
+Save the file to update the CR in the cluster.
+
+NOTE: The config file specified in the above example is
+link:https://github.com/enterprise-contract/config/blob/main/slsa3/policy.yaml[this
+one]. There are some other
+link:https://github.com/enterprise-contract/config[predefined configurations
+available] in that same repo. You can of course substitute your own git repo
+with your own customized policy file.
+
+NOTE: The `//` syntax in the git url is used to separate the git repo location
+and the subdirectory inside the git repo. EC will look for a `policy.yaml` or
+`.ec/policy.yaml` file in the directory specified, or at the top level of the git
+repo if no directory is specified. For details on this syntax consult the link:https://github.com/hashicorp/go-getter#url-format[go-getter documentation].
+
+== Using an EnterpriseContractPolicy Kubernetes Custom Resource (CR)
+
+In the above example we set the `POLICY_CONFIGURATION` parameter in the
+`IntegrationTestScenario` Custom Resource (CR) a git url. It's also possible to set it to the name
+of a `EnterpriseContractPolicy` CR present in the cluster.
+
+The following procedure shows how to create such a CR and reference it in the
+`POLICY_CONFIGURATION` param.
+
+Create a yaml file called `policy.yaml` with the following content:
+
+[,yaml]
+----
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: EnterpriseContractPolicy
+metadata:
+  name: ec-policy
+spec:
+  description: An example custom EC policy
+  publicKey: k8s://tekton-chains/public-key
+  sources:
+    - name: Release policies
+      policy:
+        - github.com/enterprise-contract/ec-policies//policy/lib
+        - github.com/enterprise-contract/ec-policies//policy/release
+      data:
+        - github.com/enterprise-contract/ec-policies//data
+  configuration:
+    include:
+      - "*"
+    exclude:
+      - hermetic_build_task.*
+----
+
+This particular example will include every rule except for rules in the
+`hermetic_build_task` package.
+
+Ensure you have a current token and then create the CR in the cluster as follows:
+
+[,shell]
+----
+$ oc create -f policy.yaml
+----
+
+The next step is to modify the IntegrationTestScenario CR as described above.
+
+[,shell,subs="+quotes"]
+----
+$ oc edit integrationtestscenario <testname>
+----
+
+The POLICY_CONFIGURATION value should be set to the name of the
+EnterpriseContractPolicy CR that was just created.
+
+[,yaml]
+----
+…
+spec:
+  params:
+    - name: POLICY_CONFIGURATION
+      value: ec-policy
+…
+----
+
+Once again the API version workaround is needed, so modify the `apiVersion` value.
+
+[,yaml]
+----
+apiVersion: appstudio.redhat.com/v1alpha1
+----
+
+Save the YAML file to update the IntegrationTestScenario CR with the new
+policy configuration parameter value.
+
+== Retriggering the integration test
+
+There's currently no way to retrigger just the integration test, so to rerun
+the Enterprise Contract pipeline a retrigger of the build pipeline is required.
+
+This can be achieved by opening a new PR, typing `/retest` in an existing PR,
+or by pushing a commit to `main` branch. An empty commit works fine, so you
+could do this for example:
+
+[,shell]
+----
+$ git commit -m "Trigger an RHTAP rebuild" --allow-empty && git push origin main
+----
+
+For testing and debugging Enterprise Contract policies conveniently on your
+workstation, you can use command line ec xref:cli.adoc[as
+described here].
