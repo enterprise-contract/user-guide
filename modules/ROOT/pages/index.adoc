@@ -2,7 +2,7 @@
 = Enterprise Contract User Guide
 
 This documentation will describe how to use Enterprise Contract, particularly
-with Red Hat Trusted Application Pipeline (RHTAP).
+with link:https://developers.redhat.com/products/trusted-software-supply-chain/overview[Red Hat Trusted Application Pipeline].
 
 See also the
 link:https://redhat-appstudio.github.io/docs.stonesoup.io/Documentation/main/[App
