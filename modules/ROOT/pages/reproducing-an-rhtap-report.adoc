@@ -1,0 +1,46 @@
+= Reproducing an RHTAP Enterprise Contract report locally
+
+This requires that you installed `ec` locally as described in
+xref:cli.adoc[Command line EC], and that you have at least one Enterprise
+Contract integration test pipeline run in your RHTAP environment.
+
+include::partial$oc_login.adoc[]
+
+Run the following commands to extract the raw YAML output from the most recent
+Enterprise Contract pipeline run.
+
+[,bash]
+----
+TR_NAME=$( kubectl get taskrun --selector tekton.dev/task=verify-enterprise-contract --sort-by='.status.startTime' -o name | tail -1 )
+POD_NAME=$( kubectl get $TR_NAME -o jsonpath='{.status.podName}' )
+kubectl logs -c step-report $POD_NAME | tee ec-report.yaml
+----
+
+Extract some useful parts of the EC report output and save them to files.
+
+[,bash]
+----
+yq .key ec-report.yaml | tee key.pub
+yq .policy ec-report.yaml | tee policy.yaml
+----
+
+Extracting the components list is similar, but a little more complicated. Note that it currently needs to be JSON formatted.
+
+[,bash]
+----
+yq -o json '{"components":.components.[] | [{"name":.name, "containerImage":.containerImage}]}' ec-report.yaml | tee snapshot.json
+----
+
+With the snapshot file, the public key and the policy file, we can reproduce the Enterprise Contract output like this:
+
+[,bash]
+----
+ec validate image --file-path snapshot.json --public-key key.pub --policy policy.yaml --info --output yaml | tee ec-report-new.yaml
+----
+
+You can check the diff to see if there are any differences:
+
+[,bash]
+----
+diff ec-report.yaml ec-report-new.yaml # ...or vimdiff
+----

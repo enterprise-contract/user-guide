@@ -135,3 +135,6 @@ command to try different policy configurations. See
 xref:ecc:ROOT:index.adoc[the configuration docs] for more information on the
 `policy.yaml` file, or take a look at the examples
 link:https://github.com/enterprise-contract/config[here].
+
+See also the how-to on xref:reproducing-an-rhtap-report.adoc[reproducing the Enterprise Contract output from an RHTAP
+integration test].

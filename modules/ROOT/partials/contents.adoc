@@ -5,6 +5,7 @@
 * How-to guides
 ** xref:cosign.adoc[Using Cosign]
 ** xref:cli.adoc[Command line EC]
+** xref:reproducing-an-rhtap-report.adoc[Reproducing an RHTAP EC report locally]
 ** xref:custom-config.adoc[Using custom configuration]
 ** xref:custom-data.adoc[Using custom data]
 
