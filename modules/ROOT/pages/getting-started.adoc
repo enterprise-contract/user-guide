@@ -4,17 +4,17 @@
 == Creating an application
 
 If you don't already have an application defined in RHTAP, follow the
-link:https://redhat-appstudio.github.io/docs.stonesoup.io/Documentation/main/getting-started/get-started/[getting
+link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/getting-started/get-started/[getting
 started guide here]. Once that's done you should have an application with at least one component.
 
 To get the most out of Enterprise Contract it's recommended that you also upgrade to a custom build pipeline
-link:https://redhat-appstudio.github.io/docs.stonesoup.io/Documentation/main/how-to-guides/proc_upgrade_build_pipeline/[as
+link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/how-to-guides/proc_upgrade_build_pipeline/[as
 described here].
 
 == Creating an integration test
 
 To run the Enterprise Contract pipeline automatically after each build, create an integration test
-link:https://redhat-appstudio.github.io/docs.stonesoup.io/Documentation/main/how-to-guides/proc_managing-compliance-with-the-enterprise-contract/[as described here].
+link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/how-to-guides/proc_managing-compliance-with-the-enterprise-contract/[as described here].
 
 NOTE: You can view the definitions of the
 link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml[Enterprise Contract pipeline],
