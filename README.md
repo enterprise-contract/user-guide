@@ -1,4 +1,4 @@
-Enterprise Contract Cookbook
+Enterprise Contract User Guide
 ============================
 
 Some high level documentation on how to use and configure Enterprise Contract in
