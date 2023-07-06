@@ -13,8 +13,10 @@ described here].
 
 == Creating an integration test
 
-To run the Enterprise Contract pipeline automatically after each build, create an integration test
-link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/how-to-guides/proc_managing-compliance-with-the-enterprise-contract/[as described here].
+To run the Enterprise Contract pipeline automatically after each build, an integration test is
+used. One should be automatically created when a new application is created. The process of
+recreating it manually is
+link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/how-to-guides/proc_managing-compliance-with-the-enterprise-contract/[described here].
 
 NOTE: You can view the definitions of the
 link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml[Enterprise Contract pipeline],
