@@ -17,6 +17,6 @@ $(HACBS_DOCS_DIR):
 CURRENT_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 ec-docs-preview: $(HACBS_DOCS_DIR) ## Build a preview of the documentation
 	cd $(HACBS_DOCS_DIR) && \
-	  yq e -i '.content.sources[] |= select(.url == "*ec-cookbook*").url |= "../../ec-cookbook"' antora-playbook.yml && \
-	  yq e -i '.content.sources[] |= select(.url == "*ec-cookbook*").branches |= "$(CURRENT_BRANCH)"' antora-playbook.yml && \
+	  yq e -i '.content.sources[] |= select(.url == "*user-guide*").url |= "../../user-guide"' antora-playbook.yml && \
+	  yq e -i '.content.sources[] |= select(.url == "*user-guide*").branches |= "$(CURRENT_BRANCH)"' antora-playbook.yml && \
 	  npm ci && npm run build
