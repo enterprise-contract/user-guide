@@ -63,7 +63,7 @@ is the default used by Tekton Chains, though this may change in the future.)
 
 a| https://slsa.dev/spec/v1.0/threats#f-upload-modified-package[Threat (G) - Upload modified package],
 https://slsa.dev/spec/v1.0/threats#h-use-compromised-package[Threat (H) - Use compromised package] (v1.0)
-a| Image signature check passed
+a| xref:ec-policies:ROOT:release_policy.adoc#builtin_image__signature_check[Image signature check passed]
 a| Enterprise Contract uses a public key to validate the signature of the image using https://docs.sigstore.dev/cosign/overview/[Cosign]. If the image
 signature can't be verified for any reason, a failure will be reported. There are other ways to verify image signatures, e.g. by using `cosign` directly,
 but EC will happily do it for you.
@@ -73,7 +73,7 @@ using https://docs.sigstore.dev/fulcio/overview/[Sigstore Fulcio], though RHTAP 
 signing keys to sign images and attestations.
 
 a| https://slsa.dev/spec/v1.0/verifying-artifacts[Verifying Artifacts (v1.0)]
-a| Attestation signature check passed
+a| xref:ec-policies:ROOT:release_policy.adoc#builtin_attestation__signature_check[Attestation signature check passed]
 a| As well as verifying the image signature, EC also verifies the signature of the attestation, which is an important part of the artifact
 verification process. For RHTAP the same key is used to sign the attestation and the image itself. As mentioned above, there is experimental
 support for verifying keylessly signed attestations.
