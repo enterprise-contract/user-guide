@@ -81,7 +81,7 @@ metadata:
   name: ec-policy
 spec:
   description: An example custom EC policy
-  publicKey: k8s://tekton-chains/public-key
+  publicKey: k8s://openshift-pipelines/public-key
   sources:
     - name: Release policies
       policy:

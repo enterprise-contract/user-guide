@@ -26,7 +26,7 @@ Using project "default".
 [.console-input]
 [source, bash]
 ----
-kubectl get -n tekton-chains secret public-key -o json | jq -r '.data."cosign.pub" | @base64d' > cosign.pub
+kubectl get -n openshift-pipelines secret public-key -o json | jq -r '.data."cosign.pub" | @base64d' > cosign.pub
 ----
 
 == Extracting the default ECP config
@@ -92,7 +92,7 @@ configuration:
     - minimal
 description: |
   Default EnterpriseContractPolicy. If a different policy is desired, this resource can serve as a starting point.
-publicKey: k8s://tekton-chains/public-key
+publicKey: k8s://openshift-pipelines/public-key
 sources:
   - data:
       - oci::quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
@@ -442,7 +442,7 @@ with the default. The solution is to create a custom policy repo and apply that 
 
 === Creating the custom policy source
 To create a custom policy, we'll start by creating a git repo for it.
-If you don't have a git repo created already, let's start by creating one. If you do, start by creating the file 
+If you don't have a git repo created already, let's start by creating one. If you do, start by creating the file
 `policy/myorg.rego` with the content below.
 
 [.console-input]
@@ -488,7 +488,7 @@ deny contains result if {
   result := lib.result_helper(rego.metadata.chain(), [])
 }
 ----
-The above policy will throw a violation if a task named `myorg-task` is not found in the build. 
+The above policy will throw a violation if a task named `myorg-task` is not found in the build.
 
 === Configuring EC to use the custom policy source
 Let's modify the `policy.yml` file to add an extra policy source:
@@ -510,7 +510,7 @@ sources:
       - git::https://github.com/joejstuart/ec-policy-demo//policy
 ----
 TIP: The data source `oci::quay.io/hacbs-contract/ec-policy-data:latest` will give you access to some very useful helper methods.
-For instance, `lib.result_helper(rego.metadata.chain(), [])` collects information from the `custom` annotation and uses it in the 
+For instance, `lib.result_helper(rego.metadata.chain(), [])` collects information from the `custom` annotation and uses it in the
 `ec-cli` output. This can be helpful debugging violations.
 
 Now let's run ec again:
