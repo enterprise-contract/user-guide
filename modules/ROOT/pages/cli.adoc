@@ -113,13 +113,13 @@ $ ec validate image --image "$IMAGE" --public-key key.pub --policy policy.yaml -
 
 ////
 // This doesn't work for general users since they don't have the permissions to
-// the tekton-chains namespace.
+// the openshift-pipelines namespace.
 
 If you have access to the RHTAP cluster, you can extract the public key like this:
 
 [,shell]
 ----
-kubectl get -n tekton-chains secret public-key -o jsonpath='{.data.cosign\.pub}' > cosign.pub
+kubectl get -n openshift-pipelines secret public-key -o jsonpath='{.data.cosign\.pub}' > cosign.pub
 ----
 ////
 

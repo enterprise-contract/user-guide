@@ -43,7 +43,7 @@ from the corresponding member cluster:
 [.console-input]
 [source, bash]
 ----
-kubectl get -n tekton-chains secret public-key -o json | jq -r '.data."cosign.pub" | @base64d' > cosign.pub
+kubectl get -n openshift-pipelines secret public-key -o json | jq -r '.data."cosign.pub" | @base64d' > cosign.pub
 ----
 
 == Validating the image
