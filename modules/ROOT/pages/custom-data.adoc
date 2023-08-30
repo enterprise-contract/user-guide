@@ -1,5 +1,5 @@
 
-== Customizing EC data
+= Customizing EC data
 
 I'll work through real-world example.
 
