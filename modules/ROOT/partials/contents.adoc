@@ -8,5 +8,6 @@
 ** xref:reproducing-an-rhtap-report.adoc[Reproducing an RHTAP EC report locally]
 ** xref:custom-config.adoc[Using custom configuration]
 ** xref:custom-data.adoc[Using custom data]
+** xref:hitchhikers-guide.adoc[Hitchhiker's Guide to EC]
 
 * xref:slsa.adoc[EC & SLSA]

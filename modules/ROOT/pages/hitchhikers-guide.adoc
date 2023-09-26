@@ -1,0 +1,282 @@
+= Hitchhiker's Guide to Enterprise Contract
+
+The Enterprise Contract can be used to validate a software artifact, e.g. a container image, that
+has already been signed and attested. This document assumes you do not have such an artifact. It
+walks you through the process of signing and attesting a container image, then how to use EC to
+validate those operations.
+
+== Required Tooling
+
+Before starting, the following tooling is required:
+
+* https://github.com/sigstore/cosign#installation[cosign]
+* https://enterprisecontract.dev/docs/user-guide/main/cli.html[ec cli]
+* https://github.com/containers/skopeo[skopeo] or
+  https://github.com/google/go-containerregistry/tree/main/cmd/crane[crane]
+* https://docs.docker.com/engine/reference/run/[docker] or https://podman.io/[podman] (optional)
+
+== Container Repository
+
+During this guide, image signatures and attestations will be pushed to the container repository
+where the image resides. Using a local registry is ideal for testing purposes. If you have a
+container runtime installed, e.g. https://docs.docker.com/engine/reference/run/[docker] or
+https://podman.io/[podman], you can start one with ease:
+
+[source, bash]
+----
+docker run -it -d -p 5000:5000 --restart=always --name registry registry:2
+# or with podman:
+# podman run -it -d -p 5000:5000 --restart=always --name registry registry:2
+----
+
+Alternatively, if you have access to a repository in an existing registry, e.g. quay.io or
+docker.io, then you can just use that.
+
+Set the shell variable `REPOSITORY` accordingly:
+
+[source, bash]
+----
+REPOSITORY='localhost:5000/ec-zero-to-hero'
+----
+
+== Container Image
+
+Before signing and attesting an image, we need... well... a container image! Any image will do. You
+can use the ec-cli image if you need one, `quay.io/enterprise-contract/ec-cli:latest`.
+
+Let's copy the image to our test repository. This can be done with a tool such as
+https://github.com/containers/skopeo[skopeo] or
+https://github.com/google/go-containerregistry/tree/main/cmd/crane[crane]:
+
+[source, bash]
+----
+crane copy quay.io/enterprise-contract/ec-cli:latest "$REPOSITORY:latest"
+# or with skopeo:
+# skopeo copy docker://quay.io/enterprise-contract/ec-cli:latest \
+#  "docker://$REPOSITORY:latest" --dest-tls-verify=false
+# NOTE: Only set `--dest-tls-verify=false` if you are using a local registry.
+----
+
+== Generate Signining Key
+
+In order to sign and attest the image, we need a signing key.
+
+[source, bash]
+----
+cosign generate-key-pair
+----
+
+Enter a new password for the key-pair on the password prompt. For the purpose of this guide, use
+something memorable like `top-secret`. Otherwise, always use a strong secret password.
+
+The command should generate two files in the currently working directory. `cosign.pub` is the public
+key. We will use this later during verification. This can, and should, be distributed freely to
+anyone that may want to verify the image. `cosign.key` is the private key. This is used for signing
+content. Treat this like the password you provided. No one other than the entity responsible for
+singing and attestating images should have access to this.
+
+== Signing the Image
+
+We use `cosign` to sign our image.
+
+[source, bash]
+----
+cosign sign --key cosign.key $REPOSITORY:latest
+----
+
+Enter the key-pair password and `y` to upload a transaction record to the public instance of
+https://docs.sigstore.dev/logging/overview/[Rekor] hosted by the https://www.sigstore.dev/[Sigstore]
+project.
+
+== Attesting the Image
+
+Next, let's use `cosign` again to associate a SLSA Provenance attestion to the image.
+
+Usually, the software delivery service responsible for building the container image is also
+responsible for providing the SLSA Provenance attestation. Here, we will use an example one instead.
+
+First, create the content of the SLSA Provenance:
+
+[source, bash]
+----
+echo '{
+  "builder": {
+    "id": "https://localhost/dummy-id"
+  },
+  "buildType": "https://localhost/dummy-type",
+  "invocation": {},
+  "buildConfig": {},
+  "metadata": {
+    "buildStartedOn": "2023-09-25T16:26:44Z",
+    "buildFinishedOn": "2023-09-25T16:28:59Z",
+    "completeness": {
+      "parameters": false,
+      "environment": false,
+      "materials": false
+    },
+    "reproducible": false
+  },
+  "materials": []
+}
+' > predicate.json
+----
+
+Now, create an attestation and attach it to the container image.
+
+[source, bash]
+----
+cosign attest --predicate predicate.json --type slsaprovenance --key cosign.key "$REPOSITORY:latest"
+----
+
+As done while signing the image, enter the key-pair password and `y` to upload a transaction record
+to the same https://docs.sigstore.dev/logging/overview/[Rekor] instance.
+
+== Quick Check
+
+At this point, the command `cosign tree` should detect the image has one signature and one
+attestation.
+
+[source, bash]
+----
+$ cosign tree "$REPOSITORY:latest"
+📦 Supply Chain Security Related artifacts for an image: localhost:5000/ec-zero-to-hero:latest
+└── 💾 Attestations for an image tag: localhost:5000/ec-zero-to-hero:sha256-b5430d3d447434c795a508036e5046e41c009039be5b3f656f121c2426500d1e.att
+   └── 🍒 sha256:ad5ee60aedd8ada59a559cd2e4b83ccc9bd1aaa97a8b48ba151d728afec31bbc
+└── 🔐 Signatures for an image tag: localhost:5000/ec-zero-to-hero:sha256-b5430d3d447434c795a508036e5046e41c009039be5b3f656f121c2426500d1e.sig
+   └── 🍒 sha256:09dc4217ce34b7db29acb9e914067db2092e8dfbf4c7603857114d9b2ac7f0ab
+
+----
+
+We are ready to verify the image with the Enterprise Contract CLI!
+
+== Basic Verification
+
+The most basic verification that can be done with the EC cli is to verify the image has a signature
+and a SLSA Provenance attestation matching a given public key.
+
+[source, bash]
+----
+ec validate image --public-key cosign.pub --image "$REPOSITORY:latest" --policy ''
+----
+
+The command should succeed and it should generate a report.
+
+The `--output` flag can be used to display the report in different formats and also to write it to a
+file instead of stdout. It can be used multiple times to generate different types of reports. The
+flag `--show-successes` adds to the report all the checks that succeeded. `--info` displays a little
+more information for each check, e.g. the solution for a certain violation.
+
+== Using a policy
+
+In the previous section, we used `--policy ''`. This means no checks other than the basic signature
+checks were performed. Let's create a new policy to make things more interesting.
+
+First, we create a new https://www.openpolicyagent.org/docs/latest/policy-language/[rego] file to
+define a new policy rule:
+
+[source, bash]
+----
+echo 'package zero_to_hero
+
+import future.keywords.contains
+import future.keywords.if
+import future.keywords.in
+
+
+# METADATA
+# title: Builder ID
+# description: Verify the SLSA Provenance has the builder.id set to
+#   the expected value.
+# custom:
+#   short_name: builder_id
+#   failure_msg: The builder ID %q is not the expected %q
+#   solution: >-
+#     Ensure the correct build system was used to build the container
+#     image.
+deny contains result if {
+	some attestation in input.attestations
+	attestation.statement.predicateType == "https://slsa.dev/provenance/v0.2"
+
+	expected := "https://localhost/dummy-id"
+	got := attestation.statement.predicate.builder.id
+
+	expected != got
+
+	result := {
+		"code": "zero_to_hero.builder_id",
+		"msg": sprintf("The builder ID %q is not expected, %q", [got, expected])
+	}
+}
+' > rules.rego
+----
+
+The above contains a single policy rule that ensure the `builder.id` in the SLSA Provenance matches
+the expected value.
+
+The `METADATA` comment block is rego's way to specify
+https://www.openpolicyagent.org/docs/latest/policy-language/#metadata[annotations] for rules. EC
+leverages this in order to provide additional information in its report, see
+https://enterprisecontract.dev/docs/ec-policies/authoring.html#_rule_annotations[here].
+
+`input` is a rego object that holds all the information about the image, its signature, and its
+attestations. Its contents are defined
+https://enterprisecontract.dev/docs/ec-cli/main/policy_input.html[here]. It is also possible to save
+this object to a JSON file which is useful when writing new policy rules. To do so, use the
+`policy-input` output, e.g. `ec validate image ... --output policy-input`.
+
+Next, we create a policy configuration that uses this rule.
+
+[source, bash]
+----
+echo "
+---
+sources:
+  - policy:
+      - $(pwd)/rules.rego
+" > policy.yaml
+----
+
+This policy configuration references the rules by file name, which have to be absolute paths. This
+is useful for testing and development of rules. Referencing rules in a git repository or in an OCI
+registry are better suited for most other use cases. The
+https://enterprisecontract.dev/docs/ec-cli/main/configuration.html[docs] on policy configuration
+explain this concept further.
+
+Finally, let's use this policy in our validation and also use the previously mentioned flags to
+display additional information in the report.
+
+[source, bash]
+----
+ec validate image --public-key cosign.pub --image "$REPOSITORY:latest" --policy policy.yaml \
+    --show-successes --info --output yaml
+----
+
+That should succeed and the newly added rule should appear in the list of successes.
+
+If we change the expected value in `rules.rego`, validation should fail and the report should
+include a violation, e.g.:
+
+[source, yaml]
+----
+violations:
+  - metadata:
+      code: zero_to_hero.builder_id
+      description: Verify the SLSA Provenance has the builder.id set to the expected value.
+      solution: Ensure the correct build system was used to build the container image.
+      title: Builder ID
+    msg: The builder ID "https://localhost/dummy-id" is not expected, "https://localhost/not-dummy-id"
+----
+
+== Conclusion
+
+I hope you enjoyed this high level overview of the Enterprise Contract. You are now officially an EC
+Hero!
+
+By the way, once you are done experimenting, it is a good idea to tear down the local container
+registry and remove the cosign key-pair:
+
+[source, bash]
+----
+docker rm --force registry  # or podman rm --force registry
+rm cosign.key cosign.pub
+----
