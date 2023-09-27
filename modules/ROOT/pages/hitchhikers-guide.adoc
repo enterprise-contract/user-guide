@@ -73,7 +73,7 @@ The command should generate two files in the currently working directory. `cosig
 key. We will use this later during verification. This can, and should, be distributed freely to
 anyone that may want to verify the image. `cosign.key` is the private key. This is used for signing
 content. Treat this like the password you provided. No one other than the entity responsible for
-singing and attestating images should have access to this.
+signing and attestating images should have access to this.
 
 == Signing the Image
 
