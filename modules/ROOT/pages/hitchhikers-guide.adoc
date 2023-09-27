@@ -57,7 +57,7 @@ crane copy quay.io/enterprise-contract/ec-cli:latest "$REPOSITORY:latest"
 # NOTE: Only set `--dest-tls-verify=false` if you are using a local registry.
 ----
 
-== Generate Signining Key
+== Generate Signing Key
 
 In order to sign and attest the image, we need a signing key.
 
