@@ -106,8 +106,10 @@ Now we can run the ec like this:
 
 [,shell]
 ----
-$ ec validate image --image "$IMAGE" --public-key key.pub --policy policy.yaml --output yaml
+$ ec validate image --image "$IMAGE" --public-key key.pub --policy policy.yaml --ignore-rekor --output yaml
 ----
+
+NOTE:The image used in this example was signed and attested without using Rekor. This is why the `--ignore-rekor` flag is needed. You may not need this if you're using a different image
 
 == Finding the public key
 
