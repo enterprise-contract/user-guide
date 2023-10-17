@@ -1,13 +1,16 @@
 
 #----------------------------------------------------------------------------
-# Build a preview of the docs published at https://enterprise-contract.github.io/
+# Build a preview of the docs published at https://enterprisecontract.dev/docs/
 # including the current changes in this local repo.
+#
+# Fixme maybe: Unfortunately the docs built using this method have broken
+# stylesheet links when viewed with a local file:// url.
 #
 # Usage:
 #   make ec-docs-preview
 #
-# See also the hack/local-build.sh script in the
-# enterprise-contract.github.io repo which does something similar
+# See also the Makefile in the enterprise-contract.github.io repo which has
+# similar scripts for doing local docs preview builds.
 #
 HACBS_DOCS_DIR=../enterprise-contract.github.io/antora
 HACBS_DOCS_REPO=git@github.com:enterprise-contract/enterprise-contract.github.io.git
