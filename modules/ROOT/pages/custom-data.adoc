@@ -108,7 +108,7 @@ level success value is `true`.
 
 Notice the configuration currenly specifies the `minimal` collection. This means there
 are a subset of the rules being applied. You can see the list of rules in the
-link:https://enterprise-contract.github.io/ec-policies/release_policy.html#_available_rule_collections[documentation here].
+link:https://enterprisecontract.dev/docs/ec-policies/release_policy.html#_available_rule_collections[documentation here].
 
 You can also use ec to produce a list of the rules like this:
 
@@ -229,7 +229,7 @@ will provide a namespace later.
 
 At the beginning of this document, you logged in on a member cluster. This is, currently, required in
 order to access the default
-link:https://enterprise-contract.github.io/ecc/main/reference.html#k8s-api-github-com-enterprise-contract-enterprise-contract-controller-api-v1alpha1-enterprisecontractpolicy[EnterpriseContractPolicy]
+link:https://enterprisecontract.dev/docs/ecc/main/reference.html#k8s-api-github-com-enterprise-contract-enterprise-contract-controller-api-v1alpha1-enterprisecontractpolicy[EnterpriseContractPolicy]
 and the public key. However, resources on the
 cluster cannot be created this way. They must be created via the proxy. To do so, obtain a token from
 https://registration-service-toolchain-host-operator.apps.stone-prd-host1.wdlc.p1.openshiftapps.com/[here]
@@ -268,10 +268,10 @@ This is the kind of thing that a RHTAP user might want to do based on what
 security policies they decide are appopriate for their situation.
 
 First, let's take a look at how that rule works. The documentation is
-link:https://enterprise-contract.github.io/ec-policies/release_policy.html#step_image_registries__disallowed_task_step_image[here].
+link:https://enterprisecontract.dev/docs/ec-policies/release_policy.html#step_image_registries__task_step_images_permitted[here].
 
 Clicking through to
-link:https://github.com/enterprise-contract/ec-policies/blob/main/policy/release/step_image_registries.rego#L32[the
+link:https://github.com/enterprise-contract/ec-policies/blob/main/policy/release/step_image_registries.rego#L33[the
 code] we can see a reference to `allowed_step_image_registry_prefixes`. This refers to some data that
 comes from the `data` source.
 
