@@ -95,10 +95,10 @@ description: |
 publicKey: k8s://openshift-pipelines/public-key
 sources:
   - data:
-      - oci::quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+      - oci::quay.io/enterprise-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
     name: Default Policies
     policy:
-      - oci::quay.io/hacbs-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+      - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
 ----
 
 Notice that the EC is currently passing. There are no violations and the top
@@ -115,7 +115,7 @@ You can also use ec to produce a list of the rules like this:
 [.console-input]
 [source, bash]
 ----
-ec inspect policy --source quay.io/hacbs-contract/ec-release-policy --collection minimal --output text
+ec inspect policy --source quay.io/enterprise-contract/ec-release-policy --collection minimal --output text
 ----
 
 By default EC applies all the rules found in the policy source. So we can just remove the collection configuration to make this happen.
@@ -129,9 +129,9 @@ Edit the policy.yml file:
 configuration: {}
 sources:
   - data:
-      - oci::quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+      - oci::quay.io/enterprise-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
     policy:
-      - oci::quay.io/hacbs-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+      - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
 ----
 
 NOTE: To make these examples tidier I removed some `description` and `name`
@@ -187,9 +187,9 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/hacbs-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+      - oci::quay.io/enterprise-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
     policy:
-      - oci::quay.io/hacbs-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+      - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
 ----
 
 Re-run ec:
@@ -279,7 +279,7 @@ NOTE: There should be an easier way for users to know what data is related to a
 rule. Perhaps just mentioning it in the annotation description is a good
 starting point.
 
-The data source in the policy config from `quay.io/hacbs-contract/ec-policy-data` includes all the data from link:https://github.com/enterprise-contract/ec-policies/tree/main/data[here].
+The data source in the policy config from `quay.io/enterprise-contract/ec-policy-data` includes all the data from link:https://github.com/enterprise-contract/ec-policies/tree/main/data[here].
 
 NOTE: This would be less confusing if we had the `ec inspect data` command, which is planned in link:https://issues.redhat.com/browse/HACBS-1732[HACBS-1732].
 
@@ -338,10 +338,10 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/hacbs-contract/ec-policy-data:latest
+      - oci::quay.io/enterprise-contract/ec-policy-data:latest
       - git::https://github.com/simonbaird/ec-data-demos//step_registry_prefixes
     policy:
-      - oci::quay.io/hacbs-contract/ec-release-policy:latest
+      - oci::quay.io/enterprise-contract/ec-release-policy:latest
 ----
 
 TIP: Actually we could have left out the `oci::` and `git::https://`
@@ -504,12 +504,12 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/hacbs-contract/ec-policy-data:latest
+      - oci::quay.io/enterprise-contract/ec-policy-data:latest
     policy:
-      - oci::quay.io/hacbs-contract/ec-release-policy:latest
+      - oci::quay.io/enterprise-contract/ec-release-policy:latest
       - git::https://github.com/joejstuart/ec-policy-demo//policy
 ----
-TIP: The data source `oci::quay.io/hacbs-contract/ec-policy-data:latest` will give you access to some very useful helper methods.
+TIP: The data source `oci::quay.io/enterprise-contract/ec-policy-data:latest` will give you access to some very useful helper methods.
 For instance, `lib.result_helper(rego.metadata.chain(), [])` collects information from the `custom` annotation and uses it in the
 `ec-cli` output. This can be helpful debugging violations.
 
