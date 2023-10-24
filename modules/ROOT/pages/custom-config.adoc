@@ -88,7 +88,8 @@ spec:
         - github.com/enterprise-contract/ec-policies//policy/lib
         - github.com/enterprise-contract/ec-policies//policy/release
       data:
-        - github.com/enterprise-contract/ec-policies//data
+        - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+        - github.com/release-engineering/rhtap-ec-policy//data
   configuration:
     include:
       - "*"

@@ -95,7 +95,8 @@ description: |
 publicKey: k8s://openshift-pipelines/public-key
 sources:
   - data:
-      - oci::quay.io/enterprise-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - github.com/release-engineering/rhtap-ec-policy//data
     name: Default Policies
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
@@ -129,7 +130,8 @@ Edit the policy.yml file:
 configuration: {}
 sources:
   - data:
-      - oci::quay.io/enterprise-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
 ----
@@ -187,7 +189,8 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/enterprise-contract/ec-policy-data:latest@sha256:2321f0c6e9367d9e203dfbd17455cb0238d4c9b55e61e11ab659948d9bb8af9e
+      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
 ----
@@ -279,7 +282,21 @@ NOTE: There should be an easier way for users to know what data is related to a
 rule. Perhaps just mentioning it in the annotation description is a good
 starting point.
 
-The data source in the policy config from `quay.io/enterprise-contract/ec-policy-data` includes all the data from link:https://github.com/enterprise-contract/ec-policies/tree/main/data[here].
+The data source in the policy config from `github.com/release-engineering/rhtap-ec-policy//data`
+includes all the data from
+link:https://github.com/release-engineering/rhtap-ec-policy/tree/main/data[here]. The one from
+`oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest` is dynamically
+updated when Tasks/Pipelines are modified in the
+link:https://github.com/redhat-appstudio/build-definitions[redhat-appstudio/build-definitions]
+repository. You can view the combined data sources like this:
+
+[.console-input]
+[source, bash]
+----
+ec inspect policy-data \
+  --source github.com/release-engineering/rhtap-ec-policy//data \
+  --source oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+----
 
 NOTE: This would be less confusing if we had the `ec inspect data` command, which is planned in link:https://issues.redhat.com/browse/HACBS-1732[HACBS-1732].
 
@@ -338,7 +355,8 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/enterprise-contract/ec-policy-data:latest
+      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - github.com/release-engineering/rhtap-ec-policy//data
       - git::https://github.com/simonbaird/ec-data-demos//step_registry_prefixes
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest
@@ -504,7 +522,8 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/enterprise-contract/ec-policy-data:latest
+      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest
       - git::https://github.com/joejstuart/ec-policy-demo//policy
