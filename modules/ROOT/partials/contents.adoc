@@ -11,3 +11,5 @@
 ** xref:hitchhikers-guide.adoc[Hitchhiker's Guide to EC]
 
 * xref:slsa.adoc[EC & SLSA]
+
+* xref:glossary.adoc[Glossary]
