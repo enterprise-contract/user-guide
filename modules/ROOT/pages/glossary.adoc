@@ -1,0 +1,45 @@
+= Glossary
+
+Here is a list of terms we use when discussing Enterprise Contracts
+
+:toc: 
+
+[[_enterprise_contract]]
+== Enterprise Contract
+
+A set of requirements imposed upon software delivery artifacts implemented in a <<_enterprise_contract_policy>> fulfilling a gating role allowing or preventing a release of these artifacts
+
+[[_enterprise_contract_policy]]
+== Enterprise Contract Policy
+
+An implementation of <<_enterprise_contract>> comprised of one or more <<_policy_rule>>
+
+[[_policy_rule]]
+== Policy Rule
+
+Individual expression of <<_enterprise_contract_policy>>. For example: all images should be signed. Evaluation of Policy Rules determines if a release of software artifact is permitted or prevented
+
+[[_non-blocking_policy_rule]]
+== Non-blocking Policy
+
+A <<_policy_rule>> that even if violated does not prevent a release of software artifacts. Marking a *Policy Rule* as non-blocking is external to the *Policy Rule* implementation.
+
+[[_time-based_policy_rule]]
+== Time-based Policy Rule
+
+A <<_policy_rule>> that behaves like a <<_non-blocking_policy_rule>> until a certain time in the future at which point it behaves like a regular <<_policy_rule>>.
+
+[[_authorizer]]
+== Authorizer
+
+The person responsible for authorizing one or more releases. For Red Hat, this is a Red Hat employee at a certain role (e.g. Project Manager, Product Owner, Technical Lead, etc). It is up to the Application maintainer to define the authorizer.
+
+[[_authorization]]
+== Authorization
+
+A statement that an Authorizer allows component builds from certain git references to be released.
+
+[[_attestation]]
+== Attestation
+
+A process of generating verifiable claims about any aspect of how a piece of software is produced. In technical terms specified via https://github.com/in-toto/attestation/tree/v1.0/[In-toto Attestation Framework].
