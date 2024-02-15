@@ -1,7 +1,7 @@
 
 = Using custom configuration
 
-== Accessing the RHTAP cluster using `oc` or `kubectl`
+== Accessing the Konflux cluster using `oc` or `kubectl`
 
 include::partial$oc_login.adoc[]
 
@@ -148,7 +148,7 @@ could do this for example:
 
 [,shell]
 ----
-$ git commit -m "Trigger an RHTAP rebuild" --allow-empty && git push origin main
+$ git commit -m "Trigger a Konflux rebuild" --allow-empty && git push origin main
 ----
 
 For testing and debugging Enterprise Contract policies conveniently on your

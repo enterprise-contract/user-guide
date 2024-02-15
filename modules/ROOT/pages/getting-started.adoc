@@ -1,9 +1,9 @@
 
-= Getting started with Enterprise Contract & Red Hat Trusted Application Pipeline
+= Getting started with Enterprise Contract & Konflux CI
 
 == Creating an application
 
-If you don't already have an application defined in RHTAP, follow the
+If you don't already have an application defined in Konflux, follow the
 link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/getting-started/get-started/[getting
 started guide here]. Once that's done you should have an application with at least one component.
 

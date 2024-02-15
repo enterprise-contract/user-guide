@@ -65,7 +65,7 @@ $ ec --help
 
 == Validating an image
 
-To run ec against a particular container image built by RHTAP, we use the
+To run ec against a particular container image built by Konflux, we use the
 `ec validate image` command. To see the command options you can use the
 `--help` flag, e.g.:
 
@@ -117,7 +117,7 @@ NOTE:The image used in this example was signed and attested without using Rekor.
 // This doesn't work for general users since they don't have the permissions to
 // the openshift-pipelines namespace.
 
-If you have access to the RHTAP cluster, you can extract the public key like this:
+If you have access to the Konflux cluster, you can extract the public key like this:
 
 [,shell]
 ----
@@ -130,7 +130,7 @@ xref:getting-started.adoc[Getting started...], the public key is visible in the
 logs for the pipeline run.
 
 NOTE: In the future there should be a better way to find the public key file
-for the signing secret used by Tekton Chains in the RHTAP build system.
+for the signing secret used by Tekton Chains in the Konflux build system.
 
 You can now modify the `policy.yaml` file and re-run the `ec validate image`
 command to try different policy configurations. See
@@ -138,5 +138,5 @@ xref:ecc:ROOT:index.adoc[the configuration docs] for more information on the
 `policy.yaml` file, or take a look at the examples
 link:https://github.com/enterprise-contract/config[here].
 
-See also the how-to on xref:reproducing-an-rhtap-report.adoc[reproducing the Enterprise Contract output from an RHTAP
+See also the how-to on xref:reproducing-an-rhtap-report.adoc[reproducing the Enterprise Contract output from a Konflux
 integration test].

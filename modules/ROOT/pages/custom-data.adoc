@@ -267,7 +267,7 @@ Rather than skip the test, let's imagine you want to modify the behavior of the
 `step_image_registries.disallowed_task_step_image` rule to allow images from
 the `quay.io/openshift-release-dev`.
 
-This is the kind of thing that a RHTAP user might want to do based on what
+This is the kind of thing that a Konflux user might want to do based on what
 security policies they decide are appopriate for their situation.
 
 First, let's take a look at how that rule works. The documentation is

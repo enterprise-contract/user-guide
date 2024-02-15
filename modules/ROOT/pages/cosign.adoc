@@ -1,9 +1,10 @@
 
-= Using Cosign to verify RHTAP build signatures & attestations
+= Using Cosign to verify Konflux build signatures & attestations
 
 In this section we'll provide examples showing how to use cosign to verify
-signatures and attestations for builds created by Red Hat Trusted Application
-Pipeline, RHTAP.
+signatures and attestations for builds created by [Konflux
+CI](https://github.com/konflux-ci), formerly [Red Hat App
+Studio](https://github.com/redhat-appstudio).
 
 For detailed information on Cosign refer to the
 link:https://docs.sigstore.dev/cosign/overview/[official documentation].
@@ -12,8 +13,8 @@ This document assumes cosign version 2.
 
 == Introduction
 
-RHTAP uses link:https://tekton.dev/docs/chains/[Tekton Chains] to sign the
-images created by RHTAP build pipelines, and to create signed attestations
+Konflux uses link:https://tekton.dev/docs/chains/[Tekton Chains] to sign the
+images created by Konflux build pipelines, and to create signed attestations
 that include details about the Tekton pipeline run that created the image.
 
 It's possible to verify these signatures and view the attestation directly
@@ -24,7 +25,7 @@ the image that was created, and that you have access to that repository.
 == Obtain image reference
 
 When validating an image, from an application component for example, it is
-recommended to always use an image reference includes a digest. The RHTAP
+recommended to always use an image reference includes a digest. The Konflux
 build pipelines emit results that contain this information. They are called
 `IMAGE_URL` and `IMAGE_DIGEST`. Combine the two with the `@` to create the
 image reference with a digest. For example, if
@@ -37,7 +38,7 @@ It is also possible to obtain the image reference from the Web UI.
 
 == Obtain public key
 
-Currently, RHTAP uses a long-lived key for signing. This key can be retrieved
+Currently, Konflux uses a long-lived key for signing. This key can be retrieved
 from the corresponding member cluster:
 
 [.console-input]
@@ -49,7 +50,7 @@ kubectl get -n openshift-pipelines secret public-key -o json | jq -r '.data."cos
 == Validating the image
 
 The first step in validating an image is verifying it has been signed with the
-proper signature. This is to ensure the image was indeed built in a RHTAP
+proper signature. This is to ensure the image was indeed built in a Konflux
 build pipeline.
 
 [.console-input]
@@ -67,12 +68,12 @@ The following checks were performed on each of these signatures:
 [{"critical":{"identity":{"docker-reference":"quay.io/redhat-appstudio/user-workload"},"image":{"docker-manifest-digest":"sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d"},"type":"cosign container image signature"},"optional":null}]
 ----
 
-NOTE: At the moment, RHTAP does not use a transparency log like Rekor. Starting
+NOTE: At the moment, Konflux does not use a transparency log like Rekor. Starting
 with version 2, cosign requires the explicit flag `--insecure-ignore-tlog` to
 not use Rekor during the verification process.
 
 Next, validate that the image contains the expected SLSA Provenance attestations.
-Images built by the RHTAP build pipeline will have two of them. One representing
+Images built by the Konflux build pipeline will have two of them. One representing
 the Tekton TaskRun in which the image was built, and one representing the Tekton
 PipelineRun that contains the previously mentioned TaskRun. The attestation for
 the PipelineRun is useful in understanding all the steps used when building the
@@ -101,7 +102,7 @@ contents of the attestations.
 At the moment, the Software Bill of Materials (SBOM) attachment is not signed.
 However, it can be inspected via the `cosign download sbom` command. It is
 important to note that this command offers no guarantee that the SBOM attachment
-was produced as part of the RHTAP build pipeline.
+was produced as part of the Konflux build pipeline.
 
 [source, bash]
 ----
@@ -113,7 +114,7 @@ Found SBOM of media type: application/vnd.cyclonedx+json
 
 The snippet above saves the SBOM into a file named `sbom.json`. This file could
 also be used as input to a policy engine. However, beware that since it is not
-signed, it is susceptible to modifications outside the RHTAP build pipeline.
+signed, it is susceptible to modifications outside the Konflux build pipeline.
 
 == Using `cosign tree`
 
