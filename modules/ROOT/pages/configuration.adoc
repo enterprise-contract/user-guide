@@ -24,9 +24,9 @@ image::c64db6a88c99447507fb87e42c966fda.png[]
 TIP: Notice that the public key used to verify both the signed images and the
 signed attestations created by Tekton Chains is available in the YAML output
 also. This public key is useful if you want to use Enterprise Contract outside the
-RHTAP cluster as described in xref:cli.adoc[here].
+Konflux cluster as described xref:cli.adoc[here].
 
-== Modifying the Enterprise Contract configuration used in RHTAP
+== Modifying the Enterprise Contract configuration used in Konflux
 
 To change which configuration is used by the Enterprise Contract integration
 test, it is necessary to modify the applicable "IntegrationTestScenario"

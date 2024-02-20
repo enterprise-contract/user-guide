@@ -1,8 +1,8 @@
-= Reproducing an RHTAP Enterprise Contract report locally
+= Reproducing a Konflux Enterprise Contract report locally
 
 This requires that you installed `ec` locally as described in
 xref:cli.adoc[Command line EC], and that you have at least one Enterprise
-Contract integration test pipeline run in your RHTAP environment.
+Contract integration test pipeline run in your Konflux environment.
 
 include::partial$oc_login.adoc[]
 
