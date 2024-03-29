@@ -52,8 +52,8 @@ a| https://slsa.dev/spec/v0.1/requirements#hermetic[Hermetic Builds (v0.1)]
 a| xref:ec-policies:ROOT:release_policy.adoc#hermetic_build_task__build_task_hermetic[Build task called with hermetic param set]
 a| This rule verifies that the build task was called with a particular parameter specifying the build should be done hermeticly. This rule is specific
 to Konflux's task definitions, since EC isn't able to explicitly confirm that the build was indeed hermetic. But, when combined with the strictest
-"acceptable task bundles" rule, and a trustable source for the task definition, we can use the rule to ensure that only builds performed hermeticly can
-be released.
+xref:ec-policies:ROOT:release_policy.adoc#trusted_task__trusted[trusted tasks rule], and a trustable source for the task definition, we can use the
+rule to ensure that only builds performed hermeticly can be released.
 
 a| https://slsa.dev/spec/v1.0/verifying-artifacts#step-1-check-slsa-build-level[Verifying Artifacts (v1.0)]
 a| xref:ec-policies:ROOT:release_policy.adoc#slsa_build_build_service__slsa_builder_id_accepted[SLSA Builder ID is known and accepted]
