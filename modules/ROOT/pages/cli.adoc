@@ -140,3 +140,123 @@ link:https://github.com/enterprise-contract/config[here].
 
 See also the how-to on xref:reproducing-an-rhtap-report.adoc[reproducing the Enterprise Contract output from a Konflux
 integration test].
+
+== Validating arbitrary inputs
+
+The `ec validate input` command line can be be used to validate arbitrary
+structured data, specifically in JSON or YAML formats. The subcommand `ec
+validate input` allows for checking the compliance of arbitrary number of files,
+provided via `--file` parameter, to a set xref:ecc:ROOT:index.adoc[policy],
+provided via `--policy` parameter.
+
+For example let's consider a YAML file containing a set of sign-offs for a
+release, and a policy mandating that a release must be signed-off by at least
+two persons from each relevant department.
+
+.data.yaml - the data for validation
+[source,yaml]
+----
+---
+image: registry.io/repository/image:tag  # the image that is signed-off on
+quality_assurance:  # QA sign-offs
+  - Elena Harper
+  - Calvin Bean
+product_development:  # product sign-offs
+  - Lennon Bradford
+  - Kate Levy
+engineering:  # engineering sign-offs
+  - Zayn Simmons
+----
+
+.policy.yaml - the policy configuration
+[source,yaml]
+----
+description: ACME & co sign-off policy
+sources:
+  - name: default-sign-off
+    policy:
+      - "git::https://github.com/acme/policy.git//policy?ref=prod"
+----
+
+.signoff.rego - the policy rules in the `github.com/acme/policy.git` repository at `policy/signoff.rego`
+[source,rego]
+----
+#
+# METADATA
+# title: ACME & co Sign-off policy
+# description: >-
+#   Mandates the compliance of sign-offs within ACME & co
+#
+package signoff
+
+import rego.v1
+
+# METADATA
+# title: Each department needs to provide two sign-offs
+# description: >-
+#   Makes sure that each relevant department provided two sign-offs
+# custom:
+#   short_name: two_signoffs
+#
+deny contains result if {
+	some department in {"quality_assurance", "product_development", "engineering"}
+	count(input[department]) < 2
+	result := sprintf("Missing required sign-offs from the %s department", [department])
+}
+----
+
+With this, running the CLI shows that there is a policy violation, one sign-off
+from the engineering department is missing:
+
+[source,shell]
+----
+$ ec validate input --file data.yaml --policy policy.yaml --output yaml
+ec-version: v0.4.2
+effective-time: "2024-04-25T11:07:35.025505232Z"
+filepaths:
+- filepath: data.yaml
+  success: false
+  success-count: 1
+  successes: null
+  violations:
+  - msg: Missing required sign-offs from the engineering department
+  warnings: []
+policy:
+  description: ACME & co sign-off policy
+  sources:
+  - name: default-sign-off
+    policy:
+    - git::https://github.com/acme/policy.git//policy?ref=prod
+success: false
+Error: success criteria not met
+----
+
+=== Validating policy configuration
+
+As a convention, the
+xref:ec-policies:ROOT:release_policy.adoc#policy_data[`policy_data`] collection
+includes rules that check the conformance of xref:custom-data.adoc[rule data].
+When customizing the rule data this can be used to validate that the data is
+well formed.
+
+For this a policy as in the following example can be used:
+
+.policy.yaml - policy validating the rule data
+[source,yaml]
+----
+description: Custom rule data validation
+sources:
+  - policy:
+      - github.com/enterprise-contract/ec-policies//policy/lib
+      - github.com/enterprise-contract/ec-policies//policy/release
+    data:
+      - /path/to/rule_data.yml
+      - /path/to/required_tasks.yml
+    config:
+      include:
+        - '@policy_data'
+----
+
+Given that the policy already includes all the data needed for the validation no
+input needs to be provided on the `ec validate input` command, an empty input
+can be provided for the `--file` parameter with: `--file='{}'`.
