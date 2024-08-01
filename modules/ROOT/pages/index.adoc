@@ -5,9 +5,7 @@ This documentation will describe how to use Enterprise Contract, particularly
 with [Konflux CI](https://github.com/konflux-ci), formerly
 [Red Hat App Studio](https://github.com/redhat-appstudio).
 
-See also the
-link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/[App
-Studio Documentation].
+See also the link:https://konflux-ci.dev/docs/[Konflux-CI Documentation].
 
 == Contents
 

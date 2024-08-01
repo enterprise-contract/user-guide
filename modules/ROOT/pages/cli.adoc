@@ -92,7 +92,7 @@ download one of the predefined examples.
 
 [,shell]
 ----
-$ export IMAGE="quay.io/redhat-appstudio/ec-golden-image:latest"
+$ export IMAGE="quay.io/konflux-ci/ec-golden-image:latest"
 
 $ echo '-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEZP/0htjhVt2y0ohjgtIIgICOtQtA

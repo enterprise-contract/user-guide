@@ -29,10 +29,10 @@ recommended to always use an image reference includes a digest. The Konflux
 build pipelines emit results that contain this information. They are called
 `IMAGE_URL` and `IMAGE_DIGEST`. Combine the two with the `@` to create the
 image reference with a digest. For example, if
-`IMAGE_URL` is `quay.io/redhat-appstudio/user-workload`, and `IMAGE_DIGEST`
+`IMAGE_URL` is `quay.io/konflux-ci/user-workload`, and `IMAGE_DIGEST`
 is `sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`,
 the image reference that should be used during validatin is
-`quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`.
+`quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d`.
 
 It is also possible to obtain the image reference from the Web UI.
 
@@ -56,16 +56,16 @@ build pipeline.
 [.console-input]
 [source, bash]
 ----
-$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ IMAGE='quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
 $ cosign verify --key cosign.pub $IMAGE --insecure-ignore-tlog
 WARNING: Skipping tlog verification is an insecure practice that lacks of transparency and auditability verification for the signature.
 
-Verification for quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d --
+Verification for quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - The signatures were verified against the specified public key
 
-[{"critical":{"identity":{"docker-reference":"quay.io/redhat-appstudio/user-workload"},"image":{"docker-manifest-digest":"sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d"},"type":"cosign container image signature"},"optional":null}]
+[{"critical":{"identity":{"docker-reference":"quay.io/konflux-ci/user-workload"},"image":{"docker-manifest-digest":"sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d"},"type":"cosign container image signature"},"optional":null}]
 ----
 
 NOTE: At the moment, Konflux does not use a transparency log like Rekor. Starting
@@ -82,11 +82,11 @@ image.
 [.console-input]
 [source, bash]
 ----
-$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ IMAGE='quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
 $ cosign verify-attestation --type slsaprovenance  --key cosign.pub $IMAGE --insecure-ignore-tlog > slsa-provenance-attestations.json
 WARNING: Skipping tlog verification is an insecure practice that lacks of transparency and auditability verification for the attestation.
 
-Verification for quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d --
+Verification for quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - The signatures were verified against the specified public key
@@ -106,7 +106,7 @@ was produced as part of the Konflux build pipeline.
 
 [source, bash]
 ----
-$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ IMAGE='quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
 $ cosign download sbom $IMAGE > sbom.json
 WARNING: Downloading SBOMs this way does not ensure its authenticity. If you want to ensure a tamper-proof SBOM, download it using 'cosign download attestation <image uri>' or verify its signature using 'cosign verify --key <key path> --attachment sbom <image uri>'.
 Found SBOM of media type: application/vnd.cyclonedx+json
@@ -127,16 +127,16 @@ For example:
 [.console-input]
 [source, bash]
 ----
-$ IMAGE='quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
+$ IMAGE='quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d'
 $ cosign tree $IMAGE
-📦 Supply Chain Security Related artifacts for an image: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
-└── 💾 Attestations for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.att
+📦 Supply Chain Security Related artifacts for an image: quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+└── 💾 Attestations for an image tag: quay.io/konflux-ci/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.att
    ├── 🍒 sha256:410f897e3649a8688a0ffbcbe7c370679d9a24ec31be0a433431e4110d335fb4
    ├── 🍒 sha256:7a8154760765d3ec8f27b1c40f55d5f1c3273edf268e38ba5a01c55bc98dac4d
    └── 🍒 sha256:3c487af472fcf00827acd8721156da0e39bd8ca2aa9437aa8c5dfdc6b725e9b9
-└── 🔐 Signatures for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sig
+└── 🔐 Signatures for an image tag: quay.io/konflux-ci/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sig
    └── 🍒 sha256:cce08e81cb1722dc91c80e80b72964f41841a8351da2c60ae090138dbbdff83d
-└── 📦 SBOMs for an image tag: quay.io/redhat-appstudio/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sbom
+└── 📦 SBOMs for an image tag: quay.io/konflux-ci/user-workload:sha256-de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d.sbom
    └── 🍒 sha256:72f7c108f43c4594bec8459d516ec3e2e568474ae9fd0e974d5b1b70288238cc
 ----
 

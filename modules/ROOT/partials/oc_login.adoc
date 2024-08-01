@@ -1,3 +1,2 @@
 Follow the procedure for accessing the Konflux cluster via the `oc` command line
-client link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/getting-started/getting_started_in_cli/[as
-described here].
+client link:https://konflux-ci.dev/docs/getting-started/cli/[as described here].
