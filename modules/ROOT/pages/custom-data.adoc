@@ -48,7 +48,7 @@ TODO: Explain how to find the image ref.
 [.console-input]
 [source, bash]
 ----
-export IMAGE=quay.io/redhat-appstudio/user-workload:rrqte-devfile-sample-python-basic6-agrl
+export IMAGE=quay.io/konflux-ci/user-workload:rrqte-devfile-sample-python-basic6-agrl
 ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -I0 policy.yml)" | yq -P
 ----
 
@@ -74,7 +74,7 @@ For reference, here is the ec output I'm getting currently, with the default pol
 success: true
 components:
   - name: Unnamed
-    containerImage: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+    containerImage: quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
     violations: []
     warnings: []
     success: true
@@ -95,7 +95,7 @@ description: |
 publicKey: k8s://openshift-pipelines/public-key
 sources:
   - data:
-      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
     name: Default Policies
     policy:
@@ -130,7 +130,7 @@ Edit the policy.yml file:
 configuration: {}
 sources:
   - data:
-      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
@@ -189,7 +189,7 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
@@ -285,9 +285,9 @@ starting point.
 The data source in the policy config from `github.com/release-engineering/rhtap-ec-policy//data`
 includes all the data from
 link:https://github.com/release-engineering/rhtap-ec-policy/tree/main/data[here]. The one from
-`oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest` is dynamically
+`oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest` is dynamically
 updated when Tasks/Pipelines are modified in the
-link:https://github.com/redhat-appstudio/build-definitions[redhat-appstudio/build-definitions]
+link:https://github.com/konflux-ci/build-definitions[konflux-ci/build-definitions]
 repository. You can view the combined data sources like this:
 
 [.console-input]
@@ -295,7 +295,7 @@ repository. You can view the combined data sources like this:
 ----
 ec inspect policy-data \
   --source github.com/release-engineering/rhtap-ec-policy//data \
-  --source oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+  --source oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
 ----
 
 NOTE: This would be less confusing if we had the `ec inspect data` command, which is planned in link:https://issues.redhat.com/browse/HACBS-1732[HACBS-1732].
@@ -355,7 +355,7 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
       - git::https://github.com/simonbaird/ec-data-demos//step_registry_prefixes
     policy:
@@ -376,27 +376,27 @@ ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -
 
 [source, yaml]
 ----
-Step 0 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/buildah@sha256:381e9bfedd59701477621da93892106873a6951b196105d3d2d85c3f6d7b569b'
-Step 0 in task 'clair-scan' has disallowed image ref 'quay.io/redhat-appstudio/clair-in-ci@sha256:fd6affa3ae32625609b96642129c489bed4cee0a9426cb0e203bd5949eba98d8'
-Step 0 in task 'clamav-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'build-container' has disallowed image ref 'quay.io/konflux-ci/buildah@sha256:381e9bfedd59701477621da93892106873a6951b196105d3d2d85c3f6d7b569b'
+Step 0 in task 'clair-scan' has disallowed image ref 'quay.io/konflux-ci/clair-in-ci@sha256:fd6affa3ae32625609b96642129c489bed4cee0a9426cb0e203bd5949eba98d8'
+Step 0 in task 'clamav-scan' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
 Step 0 in task 'clone-repository' has disallowed image ref 'registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:2fa0b06d52b04f377c696412e19307a9eff27383f81d87aae0b4f71672a1cd0b'
 Step 0 in task 'deprecated-base-image-check' has disallowed image ref 'registry.access.redhat.com/ubi8/ubi-minimal@sha256:0214a28336e387c66493c61bb394e86a18f3bea8dbc46de74a26f173ff553c89'
 Step 0 in task 'init' has disallowed image ref 'registry.redhat.io/openshift4/ose-tools-rhel8@sha256:253d042ecfad7b64593112a4aa3f528d39cb5fe738852e44f009db87964cf051'
-Step 0 in task 'sanity-inspect-image' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 0 in task 'sanity-label-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 0 in task 'sanity-optional-label-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 0 in task 'sbom-json-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sanity-inspect-image' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sanity-label-check' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sanity-optional-label-check' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 0 in task 'sbom-json-check' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
 Step 0 in task 'show-summary' has disallowed image ref 'quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9f0cdc00b1b1a3c17411e50653253b9f6bb5329ea4fb82ad983790a6dbf2d9ad'
-Step 1 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/syft@sha256:09afc449976230f66848c19bb5ccf344eb0eeb4ed50747e33b53aff49462c319'
-Step 1 in task 'clair-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 1 in task 'clamav-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 1 in task 'deprecated-base-image-check' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 2 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-jvm-build-request-processor@sha256:b198cf4b33dab59ce8ac25afd4e1001390db29ca2dec83dc8a1e21b0359ce743'
-Step 2 in task 'clair-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
-Step 2 in task 'clamav-scan' has disallowed image ref 'quay.io/redhat-appstudio/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 1 in task 'build-container' has disallowed image ref 'quay.io/konflux-ci/syft@sha256:09afc449976230f66848c19bb5ccf344eb0eeb4ed50747e33b53aff49462c319'
+Step 1 in task 'clair-scan' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 1 in task 'clamav-scan' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 1 in task 'deprecated-base-image-check' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 2 in task 'build-container' has disallowed image ref 'quay.io/konflux-ci/hacbs-jvm-build-request-processor@sha256:b198cf4b33dab59ce8ac25afd4e1001390db29ca2dec83dc8a1e21b0359ce743'
+Step 2 in task 'clair-scan' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
+Step 2 in task 'clamav-scan' has disallowed image ref 'quay.io/konflux-ci/hacbs-test@sha256:2cbe93facff681d03ca71d2bf9edab99549906ac9c275979457cd0bca4311ba7'
 Step 3 in task 'build-container' has disallowed image ref 'registry.redhat.io/ubi9/python-39@sha256:a4833397a08024b156f7bccbf220b3012c206ba902767978de640128132f30c7'
 Step 4 in task 'build-container' has disallowed image ref 'registry.access.redhat.com/ubi9/buildah@sha256:c8b1d312815452964885680fc5bc8d99b3bfe9b6961228c71a09c72ca8e915eb'
-Step 5 in task 'build-container' has disallowed image ref 'quay.io/redhat-appstudio/cosign@sha256:18b3716a6225727877475e1ab4f2493915e72cffd2ce431e9901d2ed2e4b2c0b'
+Step 5 in task 'build-container' has disallowed image ref 'quay.io/konflux-ci/cosign@sha256:18b3716a6225727877475e1ab4f2493915e72cffd2ce431e9901d2ed2e4b2c0b'
 ----
 
 As you might have predicted, EC is now reporting that all the steps are using disallowed image refs.
@@ -408,7 +408,7 @@ Let's fix that now. Back in the git repo for your custom data source, modify
 ----
 rule_data_custom:
   allowed_step_image_registry_prefixes:
-    - quay.io/redhat-appstudio/
+    - quay.io/konflux-ci/
     - quay.io/openshift-release-dev/
     - registry.access.redhat.com/
     - registry.redhat.io/
@@ -437,10 +437,10 @@ ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -
 success: true
 components:
   - name: Unnamed
-    containerImage: quay.io/redhat-appstudio/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
+    containerImage: quay.io/konflux-ci/user-workload@sha256:de1c78cd8321ec999187dfc95ed5470b4a5b2bf5121a2482dba7b5965868253d
     violations: []
     warnings:
-      - msg: Pipeline task 'build-container' uses an out of date task bundle 'quay.io/redhat-appstudio-tekton-catalog/task-buildah:0.1@sha256:3ec1cd16f0467534db8e4d1ffcacfb18a5801acc763e8dcd4d92c292e3aa3de6'
+      - msg: Pipeline task 'build-container' uses an out of date task bundle 'quay.io/konflux-ci/tekton-catalog/task-buildah:0.1@sha256:3ec1cd16f0467534db8e4d1ffcacfb18a5801acc763e8dcd4d92c292e3aa3de6'
         metadata:
           code: attestation_task_bundle.out_of_date_task_bundle
           effective_on: "2022-01-01T00:00:00Z"
@@ -522,7 +522,7 @@ configuration:
     - test.test_result_failures:sanity-label-check
 sources:
   - data:
-      - oci::quay.io/redhat-appstudio-tekton-catalog/data-acceptable-bundles:latest
+      - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest

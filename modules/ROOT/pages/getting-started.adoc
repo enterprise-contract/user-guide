@@ -4,28 +4,24 @@
 == Creating an application
 
 If you don't already have an application defined in Konflux, follow the
-link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/getting-started/get-started/[getting
-started guide here]. Once that's done you should have an application with at least one component.
-
-To get the most out of Enterprise Contract it's recommended that you also upgrade to a custom build pipeline
-link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/how-to-guides/configuring-builds/proc_upgrade_build_pipeline/[as
-described here].
+link:https://konflux-ci.dev/docs/how-tos/creating/[guide]. Once that's done you should have an application with at least one component.
+To get the most out of Enterprise Contract, be sure to follow the steps in the guide so Konflux sends a pull request to your repository to define a custom build pipeline in your GitHub repository.
 
 == Creating an integration test
 
 To run the Enterprise Contract pipeline automatically after each build, an integration test is
 used. One should be automatically created when a new application is created. The process of
 recreating it manually is
-link:https://redhat-appstudio.github.io/docs.appstudio.io/Documentation/main/how-to-guides/proc_managing-compliance-with-the-enterprise-contract/[described here].
+link:https://konflux-ci.dev/docs/advanced-how-tos/managing-compliance-with-ec/[described here].
 
 NOTE: You can view the definitions of the
-link:https://github.com/redhat-appstudio/build-definitions/blob/main/pipelines/enterprise-contract.yaml[Enterprise Contract pipeline],
+link:https://github.com/konflux-ci/build-definitions/blob/main/pipelines/enterprise-contract.yaml[Enterprise Contract pipeline],
 and the link:https://github.com/enterprise-contract/ec-cli/blob/main/tasks/verify-enterprise-contract/0.1/verify-enterprise-contract.yaml[Enterprise
 Contract task].
 
 NOTE: If you prefer to pin the pipeline bundle to a particular version, instead of using the `devel` tag, use one of the pinned tags
-link:https://quay.io/repository/redhat-appstudio-tekton-catalog/pipeline-enterprise-contract?tab=tags[visible here].
-Note that the name of the tag matches a commit sha in the link:https://github.com/redhat-appstudio/build-definitions[build-definitions repo].
+link:https://quay.io/repository/konflux-ci/tekton-catalog/pipeline-enterprise-contract?tab=tags[visible here].
+Note that the name of the tag matches a commit sha in the link:https://github.com/konflux-ci/build-definitions[build-definitions repo].
 You could also use a container image digest to pin to more securely.
 
 NOTE: In the future it will be possible to use a git resolver to specify the
