@@ -87,9 +87,6 @@ And here is the default policy:
 
 [source, yaml]
 ----
-configuration:
-  collections:
-    - minimal
 description: |
   Default EnterpriseContractPolicy. If a different policy is desired, this resource can serve as a starting point.
 publicKey: k8s://openshift-pipelines/public-key
@@ -100,6 +97,9 @@ sources:
     name: Default Policies
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+    config:
+      include:
+        - '@minimal'
 ----
 
 Notice that the EC is currently passing. There are no violations and the top
@@ -127,13 +127,13 @@ Edit the policy.yml file:
 
 [source, yaml]
 ----
-configuration: {}
 sources:
   - data:
       - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+    config: {}
 ----
 
 NOTE: To make these examples tidier I removed some `description` and `name`
@@ -181,18 +181,18 @@ Modify the `policy.yaml` file:
 
 [source, yaml]
 ----
-configuration:
-  exclude:
-    - hermetic_build_task.build_task_not_hermetic
-    - tasks.missing_required_task:prefetch-dependencies
-    - tasks.missing_required_task:sast-snyk-check
-    - test.test_result_failures:sanity-label-check
 sources:
   - data:
       - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
       - github.com/release-engineering/rhtap-ec-policy//data
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest@sha256:16703532b485c4edd3cbe47f62d44a51be4b7390b663e86eb5a7372ba9ecae52
+    config:
+      exclude:
+        - hermetic_build_task.build_task_not_hermetic
+        - tasks.missing_required_task:prefetch-dependencies
+        - tasks.missing_required_task:sast-snyk-check
+        - test.test_result_failures:sanity-label-check
 ----
 
 Re-run ec:
@@ -347,12 +347,6 @@ Let's modify the `policy.yml` file to add an extra data source:
 
 [source, yaml]
 ----
-configuration:
-  exclude:
-    - hermetic_build_task.build_task_not_hermetic
-    - tasks.missing_required_task:prefetch-dependencies
-    - tasks.missing_required_task:sast-snyk-check
-    - test.test_result_failures:sanity-label-check
 sources:
   - data:
       - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
@@ -360,6 +354,12 @@ sources:
       - git::https://github.com/simonbaird/ec-data-demos//step_registry_prefixes
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest
+    config:
+      exclude:
+        - hermetic_build_task.build_task_not_hermetic
+        - tasks.missing_required_task:prefetch-dependencies
+        - tasks.missing_required_task:sast-snyk-check
+        - test.test_result_failures:sanity-label-check
 ----
 
 TIP: Actually we could have left out the `oci::` and `git::https://`
@@ -514,12 +514,6 @@ Let's modify the `policy.yml` file to add an extra policy source:
 .policy.yaml
 [source, yaml]
 ----
-configuration:
-  exclude:
-    - hermetic_build_task.build_task_not_hermetic
-    - tasks.missing_required_task:prefetch-dependencies
-    - tasks.missing_required_task:sast-snyk-check
-    - test.test_result_failures:sanity-label-check
 sources:
   - data:
       - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
@@ -527,6 +521,12 @@ sources:
     policy:
       - oci::quay.io/enterprise-contract/ec-release-policy:latest
       - git::https://github.com/joejstuart/ec-policy-demo//policy
+    config:
+      exclude:
+        - hermetic_build_task.build_task_not_hermetic
+        - tasks.missing_required_task:prefetch-dependencies
+        - tasks.missing_required_task:sast-snyk-check
+        - test.test_result_failures:sanity-label-check
 ----
 TIP: The policy source `oci::quay.io/enterprise-contract/ec-release-policy:latest` will give you access to some useful helper methods
 defined link:https://github.com/enterprise-contract/ec-policies/tree/main/policy/lib[here]. For instance, `lib.result_helper(rego.metadata.chain(), [])`
