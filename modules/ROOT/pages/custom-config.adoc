@@ -90,11 +90,11 @@ spec:
       data:
         - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest
         - github.com/release-engineering/rhtap-ec-policy//data
-  configuration:
-    include:
-      - "*"
-    exclude:
-      - hermetic_build_task.*
+      config:
+        include:
+          - "*"
+        exclude:
+          - hermetic_build_task.*
 ----
 
 This particular example will include every rule except for rules in the
