@@ -7,4 +7,4 @@ with Konflux CI.
 Uses Asciidoc and Antora.
 
 The published version should be viewable
-[here](https://enterprisecontract.dev/docs/user-guide/main/).
+[here](https://enterprisecontract.dev/docs/user-guide/).
