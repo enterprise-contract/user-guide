@@ -7,6 +7,7 @@ name: docs
       - main
     paths:
       - 'modules/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
