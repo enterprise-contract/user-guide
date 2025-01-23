@@ -1,5 +1,5 @@
 
-= Using the Enterprise Contract command line
+= Using the Conforma command line
 
 == Installation
 
@@ -125,7 +125,7 @@ kubectl get -n openshift-pipelines secret public-key -o jsonpath='{.data.cosign\
 ----
 ////
 
-If you've run EC at least once using an integration test, as described in
+If you've run Conforma at least once using an integration test, as described in
 xref:getting-started.adoc[Getting started...], the public key is visible in the
 logs for the pipeline run.
 
@@ -138,7 +138,7 @@ xref:ecc:ROOT:index.adoc[the configuration docs] for more information on the
 `policy.yaml` file, or take a look at the examples
 link:https://github.com/enterprise-contract/config[here].
 
-See also the how-to on xref:reproducing-an-rhtap-report.adoc[reproducing the Enterprise Contract output from a Konflux
+See also the how-to on xref:reproducing-an-rhtap-report.adoc[reproducing the Conforma output from a Konflux
 integration test].
 
 == Validating arbitrary inputs

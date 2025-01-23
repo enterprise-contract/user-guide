@@ -1,20 +1,20 @@
 
-= Enterprise Contract Configuration
+= Conforma Configuration
 
-Enterprise Contract configuration is described xref:ecc:ROOT:index.adoc[here].
+Conforma configuration is described xref:ecc:ROOT:index.adoc[here].
 
-The configuration used by EC can be provided by an
+The configuration used by Conforma can be provided by an
 xref:ecc:ROOT:reference.adoc[`EnterpriseContractPolicy` cluster resource], or
 it can be fetched from a git url.
 
-For xref:cli.adoc[command line use] of Enterprise Contract a local file can also be used.
+For xref:cli.adoc[command line use] of Conforma a local file can also be used.
 
 There are some pre-defined configuration files available
 link:https://github.com/enterprise-contract/config[here].
 
 == Finding the configuration used
 
-The output of the Enterprise Contract task includes a copy of the configuration
+The output of the Conforma task includes a copy of the configuration
 used. You can find it under the `policy` key in the raw YAML output where it
 can be copy and pasted.
 
@@ -23,12 +23,12 @@ image::c64db6a88c99447507fb87e42c966fda.png[]
 
 TIP: Notice that the public key used to verify both the signed images and the
 signed attestations created by Tekton Chains is available in the YAML output
-also. This public key is useful if you want to use Enterprise Contract outside the
+also. This public key is useful if you want to use Conforma outside the
 Konflux cluster as described xref:cli.adoc[here].
 
-== Modifying the Enterprise Contract configuration used in Konflux
+== Modifying the Conforma configuration used in Konflux
 
-To change which configuration is used by the Enterprise Contract integration
+To change which configuration is used by the Conforma integration
 test, it is necessary to modify the applicable "IntegrationTestScenario"
 cluster resouce.
 

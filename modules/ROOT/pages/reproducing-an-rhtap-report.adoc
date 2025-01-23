@@ -1,13 +1,13 @@
-= Reproducing a Konflux Enterprise Contract report locally
+= Reproducing a Konflux Conforma report locally
 
 This requires that you installed `ec` locally as described in
-xref:cli.adoc[Command line EC], and that you have at least one Enterprise
+xref:cli.adoc[Command line Conforma], and that you have at least one Enterprise
 Contract integration test pipeline run in your Konflux environment.
 
 include::partial$oc_login.adoc[]
 
 Run the following commands to extract the raw YAML output from the most recent
-Enterprise Contract pipeline run.
+Conforma pipeline run.
 
 [,bash]
 ----
@@ -16,7 +16,7 @@ POD_NAME=$( kubectl get $TR_NAME -o jsonpath='{.status.podName}' )
 kubectl logs -c step-report $POD_NAME | tee ec-report.yaml
 ----
 
-Extract some useful parts of the EC report output and save them to files.
+Extract some useful parts of the Conforma report output and save them to files.
 
 [,bash]
 ----
@@ -31,7 +31,7 @@ Extracting the components list is similar, but a little more complicated. Note t
 yq -o json '{"components":.components.[] | [{"name":.name, "containerImage":.containerImage}]}' ec-report.yaml | tee snapshot.json
 ----
 
-With the snapshot file, the public key and the policy file, we can reproduce the Enterprise Contract output like this:
+With the snapshot file, the public key and the policy file, we can reproduce the Conforma output like this:
 
 [,bash]
 ----

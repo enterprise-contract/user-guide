@@ -1,8 +1,8 @@
-= Hitchhiker's Guide to Enterprise Contract
+= Hitchhiker's Guide to Conforma
 
-The Enterprise Contract can be used to validate a software artifact, e.g. a container image, that
+Conforma can be used to validate a software artifact, e.g. a container image, that
 has already been signed and attested. This document assumes you do not have such an artifact. It
-walks you through the process of signing and attesting a container image, then how to use EC to
+walks you through the process of signing and attesting a container image, then how to use Conforma to
 validate those operations.
 
 == Required Tooling
@@ -147,11 +147,11 @@ $ cosign tree "$REPOSITORY:latest"
 
 ----
 
-We are ready to verify the image with the Enterprise Contract CLI!
+We are ready to verify the image with the Conforma CLI!
 
 == Basic Verification
 
-The most basic verification that can be done with the EC cli is to verify the image has a signature
+The most basic verification that can be done with the Conforma cli is to verify the image has a signature
 and a SLSA Provenance attestation matching a given public key.
 
 [source, bash]
@@ -214,7 +214,7 @@ The above contains a single policy rule that ensure the `builder.id` in the SLSA
 the expected value.
 
 The `METADATA` comment block is rego's way to specify
-https://www.openpolicyagent.org/docs/latest/policy-language/#metadata[annotations] for rules. EC
+https://www.openpolicyagent.org/docs/latest/policy-language/#metadata[annotations] for rules. Conforma
 leverages this in order to provide additional information in its report, see
 https://enterprisecontract.dev/docs/ec-policies/authoring.html#_rule_annotations[here].
 
@@ -269,7 +269,7 @@ violations:
 
 == Conclusion
 
-I hope you enjoyed this high level overview of the Enterprise Contract. You are now officially an EC
+I hope you enjoyed this high level overview of Conforma. You are now officially a Conforma
 Hero!
 
 By the way, once you are done experimenting, it is a good idea to tear down the local container

@@ -1,15 +1,15 @@
 
-= Getting started with Enterprise Contract & Konflux CI
+= Getting started with Conforma & Konflux CI
 
 == Creating an application
 
 If you don't already have an application defined in Konflux, follow the
 link:https://konflux-ci.dev/docs/how-tos/creating/[guide]. Once that's done you should have an application with at least one component.
-To get the most out of Enterprise Contract, be sure to follow the steps in the guide so Konflux sends a pull request to your repository to define a custom build pipeline in your GitHub repository.
+To get the most out of Conforma, be sure to follow the steps in the guide so Konflux sends a pull request to your repository to define a custom build pipeline in your GitHub repository.
 
 == Creating an integration test
 
-To run the Enterprise Contract pipeline automatically after each build, an integration test is
+To run the Conforma pipeline automatically after each build, an integration test is
 used. One should be automatically created when a new application is created. The process of
 recreating it manually is
 link:https://konflux-ci.dev/docs/advanced-how-tos/managing-compliance-with-ec/[described here].
@@ -29,21 +29,21 @@ pipeline definition in its git repo instead of as a Tekton bundle image
 reference. It's expected this will become the preferred way to specify the
 integration test pipeline.
 
-== Viewing Enterprise Contract results
+== Viewing Conforma results
 
-With the Enterprise Contract integration test created, each successful build
+With the Conforma integration test created, each successful build
 pipeline run will trigger an integration test pipeline run. You can find the
 integration test pipeline runs by clicking the integration test under the
 "Integration Tests" tab.
 
-The Enterprise Contract results can be seen under the "Security" tab, for example
-this shows a passing Enterprise Contract test:
+The Conforma results can be seen under the "Security" tab, for example
+this shows a passing Conforma test:
 
-.Enterprise Contract results in the "Security" tab
+.Conforma results in the "Security" tab
 image::05a225eebbec005e079a084226e869f3.png[]
 
-The raw output from the Enterprise Contract task is YAML formatted and can be
+The raw output from the Conforma task is YAML formatted and can be
 seen in the pipeline run logs, particularly under the "STEP-REPORT" heading:
 
-.Raw Enterprise Contract results in the task log
+.Raw Conforma results in the task log
 image::0dfd56dd2c4d8d000ab18e9d8a75bf99.png[]

@@ -58,7 +58,7 @@ available] in that same repo. You can of course substitute your own git repo
 with your own customized policy file.
 
 NOTE: The `//` syntax in the git url is used to separate the git repo location
-and the subdirectory inside the git repo. EC will look for a `policy.yaml` or
+and the subdirectory inside the git repo. Conforma will look for a `policy.yaml` or
 `.ec/policy.yaml` file in the directory specified, or at the top level of the git
 repo if no directory is specified. For details on this syntax consult the link:https://github.com/hashicorp/go-getter#url-format[go-getter documentation].
 
@@ -80,7 +80,7 @@ kind: EnterpriseContractPolicy
 metadata:
   name: ec-policy
 spec:
-  description: An example custom EC policy
+  description: An example custom Conforma policy
   publicKey: k8s://openshift-pipelines/public-key
   sources:
     - name: Release policies
@@ -140,7 +140,7 @@ policy configuration parameter value.
 == Retriggering the integration test
 
 There's currently no way to retrigger just the integration test, so to rerun
-the Enterprise Contract pipeline a retrigger of the build pipeline is required.
+the Conforma pipeline a retrigger of the build pipeline is required.
 
 This can be achieved by opening a new PR, typing `/retest` in an existing PR,
 or by pushing a commit to `main` branch. An empty commit works fine, so you
@@ -151,6 +151,6 @@ could do this for example:
 $ git commit -m "Trigger a Konflux rebuild" --allow-empty && git push origin main
 ----
 
-For testing and debugging Enterprise Contract policies conveniently on your
+For testing and debugging Conforma policies conveniently on your
 workstation, you can use command line ec xref:cli.adoc[as
 described here].
