@@ -1,8 +1,13 @@
 
-= Enterprise Contract User Guide
+= Conforma Contract User Guide
 
-This documentation will describe how to use Enterprise Contract, particularly
+This documentation describes how to use Conforma, particularly
 with link:https://github.com/konflux-ci[Konflux CI].
+
+NOTE: Conforma was previously known as "Enterprise Contract". You can consider
+"Conforma" and "Enterprise Contract" to be synonynous. See
+link:/posts/whats-in-a-name/[this article] for more details about the name
+change.
 
 See also the link:https://konflux-ci.dev/docs/[Konflux-CI Documentation].
 

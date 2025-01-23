@@ -1,6 +1,6 @@
 = Glossary
 
-Here is a list of terms we use when discussing Enterprise Contracts
+Here is a list of terms we use when discussing Conforma.
 
 :toc: 
 
@@ -8,6 +8,8 @@ Here is a list of terms we use when discussing Enterprise Contracts
 == Enterprise Contract
 
 A set of requirements imposed upon software delivery artifacts implemented in a <<_enterprise_contract_policy>> fulfilling a gating role allowing or preventing a release of these artifacts
+
+Also, Enterprise Contract is the former name for Conforma.
 
 [[_enterprise_contract_policy]]
 == Enterprise Contract Policy

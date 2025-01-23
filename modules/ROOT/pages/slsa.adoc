@@ -1,20 +1,20 @@
 
-= Konflux CI, Enterprise Contract, and SLSA
+= Konflux CI, Conforma, and SLSA
 
 .Overview
 ****
 
 Konflux CI is a build and CI/CD system
 that aims to meet or exceed https://slsa.dev/spec/v1.0/levels[SLSA Build L3 (v1.0)].
-Enterprise Contract is an
+Conforma is an
 https://slsa.dev/spec/v1.0/verifying-artifacts[artifact verifier] and
 customizable policy checker designed to be easily integrated with Konflux's CI/CD
 workflows.
 
-A lot of the default policies created for Konflux and enforced by EC are closely
+A lot of the default policies created for Konflux and enforced by Conforma are closely
 related to SLSA requirements, based on both the recent SLSA v1.0, and the older
 SLSA v0.1 specification. In this documentation we'll describe in more detail
-how Konflux and EC work together to provide a high standard of supply chain
+how Konflux and Conforma work together to provide a high standard of supply chain
 security, informed and guided by the link:https://slsa.dev/[SLSA
 specifications].
 
@@ -22,10 +22,10 @@ specifications].
 
 == SLSA Requirements
 
-=== SLSA requirements verified explicitly by Enterprise Contract
+=== SLSA requirements verified explicitly by Conforma
 
-Enterprise Contract comes with a set of policy rules designed for use with
-Konflux. Using EC to verify that a build passes all the checks defined by the
+Conforma comes with a set of policy rules designed for use with
+Konflux. Using Conforma to verify that a build passes all the checks defined by the
 policy provides a high level of confidence that the build was built securely
 and can be trusted.
 
@@ -33,7 +33,7 @@ Many of the policy rules are linked to specific SLSA requirements, for example:
 
 [cols="1,1,3"]
 |===
-|SLSA reference|EC policy rule|Notes
+|SLSA reference|Conforma policy rule|Notes
 
 a| https://slsa.dev/spec/v0.1/requirements#scripted-build[Scripted build (v0.1)]
 a| xref:ec-policies:ROOT:release_policy.adoc#slsa_build_scripted_build__build_script_used[Build task contains steps]
@@ -51,7 +51,7 @@ described in SLSA v1.0.
 a| https://slsa.dev/spec/v0.1/requirements#hermetic[Hermetic Builds (v0.1)]
 a| xref:ec-policies:ROOT:release_policy.adoc#hermetic_build_task__build_task_hermetic[Build task called with hermetic param set]
 a| This rule verifies that the build task was called with a particular parameter specifying the build should be done hermeticly. This rule is specific
-to Konflux's task definitions, since EC isn't able to explicitly confirm that the build was indeed hermetic. But, when combined with the strictest
+to Konflux's task definitions, since Conforma isn't able to explicitly confirm that the build was indeed hermetic. But, when combined with the strictest
 xref:ec-policies:ROOT:release_policy.adoc#trusted_task__trusted[trusted tasks rule], and a trustable source for the task definition, we can use the
 rule to ensure that only builds performed hermeticly can be released.
 
@@ -64,25 +64,25 @@ is the default used by Tekton Chains, though this may change in the future.)
 a| https://slsa.dev/spec/v1.0/threats#f-upload-modified-package[Threat (G) - Upload modified package],
 https://slsa.dev/spec/v1.0/threats#h-use-compromised-package[Threat (H) - Use compromised package] (v1.0)
 a| xref:ec-policies:ROOT:release_policy.adoc#builtin_image__signature_check[Image signature check passed]
-a| Enterprise Contract uses a public key to validate the signature of the image using https://docs.sigstore.dev/cosign/overview/[Cosign]. If the image
+a| Conforma uses a public key to validate the signature of the image using https://docs.sigstore.dev/cosign/overview/[Cosign]. If the image
 signature can't be verified for any reason, a failure will be reported. There are other ways to verify image signatures, e.g. by using `cosign` directly,
-but EC will happily do it for you.
+but Conforma will happily do it for you.
 
-There is also experimental support in EC for validating signatures for images signed keylessly
+There is also experimental support in Conforma for validating signatures for images signed keylessly
 using https://docs.sigstore.dev/fulcio/overview/[Sigstore Fulcio], though Konflux currently uses long-lived
 signing keys to sign images and attestations.
 
 a| https://slsa.dev/spec/v1.0/verifying-artifacts[Verifying Artifacts (v1.0)]
 a| xref:ec-policies:ROOT:release_policy.adoc#builtin_attestation__signature_check[Attestation signature check passed]
-a| As well as verifying the image signature, EC also verifies the signature of the attestation, which is an important part of the artifact
+a| As well as verifying the image signature, Conforma also verifies the signature of the attestation, which is an important part of the artifact
 verification process. For Konflux the same key is used to sign the attestation and the image itself. As mentioned above, there is experimental
 support for verifying keylessly signed attestations.
 
 a| https://slsa.dev/spec/v1.0/verifying-artifacts#step-1-check-slsa-build-level[Verifying Artifacts (v1.0)]
 a| xref:ec-policies:ROOT:release_policy.adoc#slsa_build_scripted_build__subject_build_task_matches[Provenance subject matches build task image result]
 a| SLSA recommends an artifact verifier checks that the provenance statement’s subject matches the digest of the artifact in question.
-This is a good sanity check to confirm that the provenance being considered is for the expected image. Because EC uses Cosign under the hood, and
-Cosign does this check as part of its signature verification, we get this confirmed automatically. The EC rule linked here performs an additional
+This is a good sanity check to confirm that the provenance being considered is for the expected image. Because Conforma uses Cosign under the hood, and
+Cosign does this check as part of its signature verification, we get this confirmed automatically. The Conforma rule linked here performs an additional
 confirmation by comparing the image reference produced by the build task and confirming that also matches the provenance subject.
 
 a| https://slsa.dev/spec/v1.0/verifying-artifacts#step-1-check-slsa-build-level[Verifying Artifacts (v1.0)]
@@ -98,10 +98,10 @@ task match what appears in the "materials" provenance.
 
 |===
 
-=== SLSA requirements not explicitly verified by Enterprise Contract
+=== SLSA requirements not explicitly verified by Conforma
 
 There are numerous SLSA Build requirements that are met by Konflux CI, but not
-explicitly verifiable with an Enterprise Contract policy rule. We won't go
+explicitly verifiable with an Conforma policy rule. We won't go
 into depth in this document, but for example:
 
 [cols="1,3"]
@@ -110,7 +110,7 @@ into depth in this document, but for example:
 
 a| https://slsa.dev/spec/v1.0/levels#build-l2-hosted-build-platform[Build L2: Hosted build platform]
 a| Due to its design, its architecture, and operational management, Konflux CI,
-meets these requirements implicitly. And, as we've seen above, the Enterprise Contract
+meets these requirements implicitly. And, as we've seen above, Conforma
 can be used to verify the authenticity of the signed provenances.
 
 a| https://slsa.dev/spec/v1.0/levels#build-l3-hardened-builds[Build L3: Hardened builds]
@@ -126,19 +126,19 @@ Linking to a general system overview of Konflux would also be useful here also I
 
 == Notes and caveats
 
-Because EC was designed initially for use with Konflux, and Konflux uses Tekton
+Because Conforma was designed initially for use with Konflux, and Konflux uses Tekton
 CI/CD, many of the specific rules mentioned above are currently Tekton specific
 in that they use details about the Tekton pipeline run, which are currently
 made available in the SLSA attestation created by Tekton Chains.
 
-This is not a limitation of EC itself, but rather just an attribute of the
+This is not a limitation of Conforma itself, but rather just an attribute of the
 xref:ec-policies:ROOT:release_policy.adoc[policies created for Konflux] in their
 current state. In the future we're aiming to extract the Tekton specific rules from
 the general SLSA rules to make the rules more generally applicable. We expected
 that policy rules for build systems not based on Tekton and Tekton Chains could
 be created easily.
 
-Note also that since EC can conveniently apply any policy defined in
+Note also that since Conforma can conveniently apply any policy defined in
 https://www.openpolicyagent.org/docs/latest/policy-language/[OPA/Rego], it is
 able to be used for a wide range of purposes, e.g. to verify certain tests were
 run and passed, and to apply any business specific release policies. Browse the
@@ -147,10 +147,10 @@ what other rules have been defined for use by Konflux within Red Hat.
 
 == Conclusion
 
-Enterprise Contract can be used as a convenient and customizable SLSA artifact
+Conforma can be used as a convenient and customizable SLSA artifact
 verifier. It's doing that now within Konflux, and we think it's capable and
 flexible enough to become a part of other build systems where supply chain security
 is a priority.
 
 If you have questions, or want to provide feedback, please reach out to the
-Enterprise Contract team via https://github.com/enterprise-contract[GitHub].
+Conforma team via https://github.com/enterprise-contract[GitHub].

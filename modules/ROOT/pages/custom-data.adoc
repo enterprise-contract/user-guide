@@ -1,5 +1,5 @@
 
-= Customizing EC data
+= Customizing Conforma data
 
 I'll work through real-world example.
 
@@ -37,7 +37,7 @@ kubectl get -n openshift-pipelines secret public-key -o json | jq -r '.data."cos
 kubectl get -n enterprise-contract-service enterprisecontractpolicy default -o yaml | yq .spec > policy.yml
 ----
 
-== Running EC locally
+== Running Conforma locally
 
 Install ec as per xref:cli.adoc[these instructions] then do the following.
 
@@ -54,7 +54,7 @@ ec validate image --image $IMAGE --public-key cosign.pub --policy "$(yq -ojson -
 
 
 In the above example we downloaded the public key and the policy, but since we
-have cluster access, it's not actually required. EC can find the public key and
+have cluster access, it's not actually required. Conforma can find the public key and
 the policy configuration in the cluster. For example we can do this, which
 should give the same result:
 
@@ -102,7 +102,7 @@ sources:
         - '@minimal'
 ----
 
-Notice that the EC is currently passing. There are no violations and the top
+Notice that Conforma is currently passing. There are no violations and the top
 level success value is `true`.
 
 == Modify the policy so all rules are applied
@@ -119,9 +119,9 @@ You can also use ec to produce a list of the rules like this:
 ec inspect policy --source quay.io/enterprise-contract/ec-release-policy --collection minimal --output text
 ----
 
-By default EC applies all the rules found in the policy source. So we can just remove the collection configuration to make this happen.
+By default Conforma applies all the rules found in the policy source. So we can just remove the collection configuration to make this happen.
 
-Let's do that and re-run the EC locally.
+Let's do that and re-run Conforma locally.
 
 Edit the policy.yml file:
 
@@ -140,7 +140,7 @@ NOTE: To make these examples tidier I removed some `description` and `name`
 fields that won't be consequential. You can leave them alone or modify them if
 you wish.
 
-Running the EC with this new policy configuration produces some violations:
+Running Conforma with this new policy configuration produces some violations:
 
 [.console-input]
 [source, bash]
@@ -339,9 +339,9 @@ link:https://github.com/simonbaird/ec-data-demos/blob/example1/step_registry_pre
 here].
 
 That's not a real registry prefix of course, but let's start with that and see
-what results EC produces.
+what results Conforma produces.
 
-=== Configuring EC to use the data source
+=== Configuring Conforma to use the data source
 
 Let's modify the `policy.yml` file to add an extra data source:
 
@@ -399,7 +399,7 @@ Step 4 in task 'build-container' has disallowed image ref 'registry.access.redha
 Step 5 in task 'build-container' has disallowed image ref 'quay.io/konflux-ci/cosign@sha256:18b3716a6225727877475e1ab4f2493915e72cffd2ce431e9901d2ed2e4b2c0b'
 ----
 
-As you might have predicted, EC is now reporting that all the steps are using disallowed image refs.
+As you might have predicted, Conforma is now reporting that all the steps are using disallowed image refs.
 
 Let's fix that now. Back in the git repo for your custom data source, modify
 `step_registry_prefixes/data.yml` to look like this:
@@ -456,7 +456,7 @@ key: ...
 
 == Adding a custom policy source
 Now imagine your organization has a need for a custom policy. A policy that doesn't exactly fit in
-with the default. The solution is to create a custom policy repo and apply that to your next EC run.
+with the default. The solution is to create a custom policy repo and apply that to your next Conforma run.
 
 === Creating the custom policy source
 To create a custom policy, we'll start by creating a git repo for it.
@@ -508,7 +508,7 @@ deny contains result if {
 ----
 The above policy will throw a violation if a task named `myorg-task` is not found in the build.
 
-=== Configuring EC to use the custom policy source
+=== Configuring Conforma to use the custom policy source
 Let's modify the `policy.yml` file to add an extra policy source:
 
 .policy.yaml
