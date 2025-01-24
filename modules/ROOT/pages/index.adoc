@@ -1,5 +1,5 @@
 
-= Conforma Contract User Guide
+= Conforma User Guide
 
 This documentation describes how to use Conforma, particularly
 with link:https://github.com/konflux-ci[Konflux CI].
