@@ -1,8 +1,8 @@
 = Reproducing a Konflux Conforma report locally
 
 This requires that you installed `ec` locally as described in
-xref:cli.adoc[Command line Conforma], and that you have at least one Enterprise
-Contract integration test pipeline run in your Konflux environment.
+xref:cli.adoc[Command line Conforma], and that you have at least one Conforma
+integration test pipeline run in your Konflux environment.
 
 include::partial$oc_login.adoc[]
 
