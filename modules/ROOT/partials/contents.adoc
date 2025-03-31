@@ -5,7 +5,7 @@
 * How-to guides
 ** xref:cosign.adoc[Using Cosign]
 ** xref:cli.adoc[Command line Conforma]
-** xref:reproducing-an-rhtap-report.adoc[Reproducing a Konflux Conforma report locally]
+** xref:reproducing-a-konflux-conforma-report.adoc[Reproducing a Konflux Conforma report locally]
 ** xref:custom-config.adoc[Using custom configuration]
 ** xref:custom-data.adoc[Using custom data]
 ** xref:hitchhikers-guide.adoc[Hitchhiker's Guide to Conforma]
